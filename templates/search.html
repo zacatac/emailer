@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+<div class="nav-page-title">
+  <h3>Find customers</h3>
+</div>
+<div class="nav-page" id="search-page">
+  <form action="{{ url_for('search') }}" method=post class=add-entry>
+    <dl>
+      <dt>First name:
+	<dd>
+	  <input type=text size=30 name=first_name>
+	</dd>
+      </dt>
+      <dt> Last name:
+	<dd> 
+	  <input type=text size=30 name=last_name>
+	</dd>
+      </dt>
+      <dt>Email:
+	<dd> 
+	  <input type=text size=30 name=email>
+	</dd>
+      </dt>
+      <dt>Birth Day (Year, Month, Day)
+      <dd> 
+	<input type=text size=4 name=year> <input type=text size=2 name=month> <input type=text size=2 name=day> 
+      </dd>
+      </dt>
+      <dd> <input type=submit value=submit></dd>
+    </dl>
+  </form>
+</div>
+  <ul class=entries>
+    {% for entry in entries %}
+    <li><h2>{{ entry.first_name }} {{ entry.last_name}}</h2>
+      {% endfor %}
+      {% else %}
+      <li><em><a href="{{url_for('login')}}">You must be logged in to search</a></em>
+  
+  {% endif %}
+{% endblock %}
