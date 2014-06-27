@@ -2,14 +2,18 @@
 <head>
     <meta charset="utf-8" />
     <title>Demo</title>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
-
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="/static/js/alertify.js"></script>    
+    <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"> -->
+    <link href="/static/css/css.css" rel="stylesheet" media="screen, projection">
+    <link href="/static/css/alertify.default.css" rel="stylesheet">
+    <link href="/static/css/alertify.core.css" rel="stylesheet">
+    <link href="/static/css/style.css" rel="stylesheet">
+    <!-- <link href="{{ url_for('static', filename='/css/style.css') }}" rel=stylesheet type=text/css > -->
 </head>
 <title>Emailer</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 <div class=page>
   <div id="title">
     <h1>ice</h1>

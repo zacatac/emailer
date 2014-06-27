@@ -10,14 +10,4 @@
       </div>    
     </div>
   {% endif %}
-  <ul class=entries>
-    <h3>{{ entries|length }} Player emails entered so far</h3>
-  {% for entry in entries %}
-    <li><h2>{{ entry.first_name }} {{ entry.last_name}}</h2>
-      <br>Email: {{ entry.email|safe }}
-      <br>Entered: {{ entry.entered }}
-  {% else %}
-    <li><em>Unbelievable.  No entries here so far</em>
-  {% endfor %}
-  </ul>
 {% endblock %}

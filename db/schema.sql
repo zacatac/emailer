@@ -9,21 +9,22 @@ CREATE TABLE customers (
   entered TEXT NOT NULL
 );
 
-CREATE TABLE laser (       
+create TABLE laser (       
   laserid INTEGER PRIMARY KEY autoincrement,
   codename TEXT,
-  customerid INTEGER REFERENCES customers
+  customer_id INTEGER REFERENCES customers
 );
 
 CREATE TABLE learnToSkate (
   skate_id INTEGER PRIMARY KEY autoincrement,
-  recent_attendance INTEGER,
-  customerid INTEGER REFERENCES customers
+  skill INTEGER,
+  customer_id INTEGER REFERENCES customers
 );
 
 CREATE TABLE visit (
   visit_id INTEGER PRIMARY KEY autoincrement,
   visit_time TEXT NOT NULL,
-  customer_id INTEGER,
-  FOREIGN KEY (customer_id) REFERENCES customers(id)
+  customer_id INTEGER REFERENCES customers
 );
+
+

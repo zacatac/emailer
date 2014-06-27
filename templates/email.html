@@ -1,116 +1,58 @@
 {% extends "layout.html" %}
 {% block body %}
   {% if session.logged_in %}
+  <script src="/static/js/email.js"></script>    
     <script language="javascript">
-     function fnCheckAlphabets() {
-       if(
-	 !((event.keyCode>43 && event.Keycode<47)
-	   ||(event.keyCode>64 && event.keyCode<123)
-	   || event.keyCode==32 ))
-       { return false;  }
-     }     
     </script>
 
     <div class="nav-page-title">
       <h3>Create a List</h3>
     </div>
-    <form action="{{ url_for('create_list') }}" method="post" class="add-entry">      
+    <form action="{{ url_for('create_list') }}" method="post" class="add-entry" id="email-add-constraint">      
       <div class="email-nav">
-	<div style="display:inline-block;" class="form-group">
-	  <select name="base" class="form-control">
-	    <option value="0">Email Address</option>
-	    <option value="1">First Name</option>
-	    <option value="2">Last Name</option>
-	    <option value="3">Birthdate</option>
-	    <option value="4">Code name</option>
-	    <option value="5">Entered</option>
-	    <option value="6">Last played</option>
-	    <option value="7">Activity</option>
-	  </select>
+	<div class="email-search-boxes" id="email-search-container">
 	</div>
-	<div style="display:inline-block;" class="form-group">
-	  <select name="relation" class="form-control">
-	    <option value="0">contains</option>
-	    <option value="1">does not contain</option>
-	    <option value="2">before</option>
-	    <option value="3">after</option>
-	    <option value="4">starts with</option>
-	    <option value="5">ends with</option>
-	    <option value="6">is</option>
-	    <option value="7">is not</option>
-	  </select>
-	</div>	
-	<div style="display:inline-block;" class="form-group">
-	  <select name="activity" class="form-control" style="display:none;">
-	    <option value="0">Laserstrike</option>
-	    <option value="1">Learn to Skate</option>
-	    <option value="2">Youth Hockey</option>
-	    <option value="3">Adult Hockey</option>
-	    <option value="4">Figure Skating</option>
-	  </select>
-	</div>	
+	<div  class="form-group">
+	  <input type=button value="+" class="btn btn-block btn-lg btn-emails btn-bar" id="add-search-boxes">
+	</div>
 
-	<div style="display:inline-block;" class="form-group">
-	  <input type="text" size=20 name="criteria" class="form-control">
-	</div>
-	<div style="display:inline-block;" class="form-group">
-	  <input type=submit value="Search" style="vertical-align:baseline;" class="btn btn-block btn-lg btn-customers submit-buttons">
+	<div  class="form-group">
+	  <input type=submit value="Search" class="btn btn-block btn-lg btn-customers submit-buttons btn-bar">
 	</div>
       </div>   
     </form>
-  <ul class=entries>
-    <h3>{{ entries|length }} Player emails entered so far</h3>
-  {% for entry in entries %}
-    <li><h2>{{ entry.first_name }} {{ entry.last_name}}</h2>
-      <br>Email: {{ entry.email|safe }}
-      <br>Entered: {{ entry.entered }}
-  {% else %}
-    <li><em>Unbelievable.  No entries here so far</em>
-  {% endfor %}
-  </ul>
     {% endif %}
+  <article id="main">
+    <div id="container">
+      <p>
+        <a href=javascript:void(); id="saveAll">Save All</a> |
+        <a href=javascript:void(); id="clearAll">Clear All</a> |
+        <a href=javascript:void(); id="exportAll">Export All</a>
+      </p>
 
-  <script>
-   document.getElementsByName('base')[0].onchange = handleBase;
-   function handleBase(){
-     var baseDropdown = document.getElementsByName('base')[0];
-     var currentValue = baseDropdown.options[baseDropdown.selectedIndex].value; 
-     var activityDropdown = document.getElementsByName('activity')[0];
-     var criteriaText = document.getElementsByName('criteria')[0];
-     var relationDropdown = document.getElementsByName('relation')[0];
-     function alterOptions(selectElement,setTo){
-       for (var i = 0; i < selectElement.options.length; i++){
-	 selectElement.options[i].disabled = setTo;
-       }
-     }
-     alterOptions(relationDropdown,false);
-     activityDropdown.style.display = "none";
-     criteriaText.style.display = "inline-block";
-     relationDropdown.value = 0;
-     switch(currentValue){
-       case "0":
-       case "1":
-       case "2":
-       case "4":
-	 relationDropdown.options[2].disabled = true;
-	 relationDropdown.options[3].disabled = true;
-	 break;
-       case "3":
-	 break;
-       case "7":
-	 alterOptions(relationDropdown,true);
-	 relationDropdown.options[6].disabled = false;
-	 relationDropdown.options[7].disabled = false;
-	 relationDropdown.value = 6;
-	 activityDropdown.style.display = "inline-block";
-	 criteriaText.style.display = "none";	 
-	 criteriaText.value = "";
-	 break;
-       default:
-	 alterOptions(relationDropdown,false);
-	 activityDropdown.style.display = "none";
-	 criteriaText.style.display = "inline-block";
-     }
-   }			 
-  </script>
+      <ul id="list" class="entries">
+	{% for entry in entries %}
+	<li id="li">  	  
+
+	  <div class="left-li">{{ entry.first_name }} {{ entry.last_name}}	  
+	    <br>Email: {{ entry.email|safe }}
+	    <br>Birthdate: {{ entry.birth}} 
+	  </div>
+
+	  <div class="right-li">
+	    <button class="btn btn-block btn-lg btn-danger" onclick="deleteParentListElement(this);"><span class="fui-cross"></span></button>
+	    <input type=button value="edit" class="btn btn-block btn-lg btn-customers" onclick="makeEditable(this);">
+	  </div>
+	</li>
+	  {% else %}
+	  <li><em>Unbelievable.  No entries here so far</em>
+	    {% endfor %}	    
+	    <script>
+	     var pluralizer = function(num,word){ console.log(parseInt(num)); if (parseInt(num) < 2){return word;}else{ return word + "s";}}
+	     alertify.success({{ entries|length }} +" "+pluralizer({{ entries|length }},'customer') +" matched");
+	    </script>
+
+      </ul>
+    </div>
+  </article>
 {% endblock %}

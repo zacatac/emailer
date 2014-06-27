@@ -3,7 +3,7 @@
     Flaskr Tests
     ~~~~~~~~~~~~
 
-    Tests the Flaskr application.
+    Tests the Ice application.
 
     :copyright: (c) 2010 by Armin Ronacher.
     :license: BSD, see LICENSE for more details.

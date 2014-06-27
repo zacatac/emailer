@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-    Flaskr
+    ICE
     ~~~~~~
 
-    A microblog example application written as Flask tutorial with
-    Flask and sqlite3.
+    A customer management application provided 
+    to the Ice Sports Forum.
 
-    :copyright: (c) 2010 by Armin Ronacher.
+    :copyright: (c) 2014 by Zackery Field.
     :license: BSD, see LICENSE for more details.
 """
 
@@ -30,7 +30,7 @@ PASSWORD = 'default'
 UPLOAD_FOLDER = './uploads/'
 ALLOWED_EXTENSIONS = set(['csv'])
 
-# create our little application :)
+# create our little application
 app = Flask(__name__)
 Bootstrap(app)
 app.config.from_object(__name__)
@@ -58,12 +58,15 @@ def get_db():
         sqlite_db = sqlite3.connect(app.config['DATABASE'])
         sqlite_db.row_factory = sqlite3.Row
         top.sqlite_db = sqlite_db
-
     return top.sqlite_db
 
 def db_contains(first_name,last_name,email):
     db = get_db()
-    already = db.execute('SELECT * FROM customers WHERE (first_name=:first_name AND last_name=:last_name) OR email=:email',
+    if email == "":
+        already = db.execute('SELECT * FROM customers WHERE (first_name=:first_name AND last_name=:last_name)',
+                             {"first_name":first_name, "last_name":last_name}).fetchone()
+    else: 
+        already = db.execute('SELECT * FROM customers WHERE (first_name=:first_name AND last_name=:last_name) OR email=:email',
                          {"first_name":first_name, "last_name":last_name,"email":email}).fetchone()
     
     if already is not None:
@@ -149,7 +152,7 @@ def add_player():
             flash('IntegrityError')
     return redirect(url_for('register'))
 
-def bulk_upload(addr):
+def bulk_upload(addr,activity):
     f = open(addr, 'rb') # opens the csv file
     print('opened file',f)
     try:
@@ -157,6 +160,12 @@ def bulk_upload(addr):
         header = True
         count = 0
         unique = 0
+        def raise_the_roof():
+            raise IntegrityError('Skating and hockey tables not yet supported')        
+        print(activity)
+        if activity not in ['0']: raise_the_roof()
+        activity_dict = {'0':'laser','1':'learnToSkate'}
+        activity = activity_dict[activity]
         for row in reader:   # iterates the rows of the file in order
             count += 1
             if header:
@@ -165,14 +174,25 @@ def bulk_upload(addr):
                 db = get_db()
                 first_name = row[0].strip().title()
                 last_name = row[1].strip().title()
+                sex = row[2].strip().title()
                 email = row[4].strip()   
                 birth = row[3].strip()
-                already = db.execute('SELECT * FROM customers WHERE first_name=:first_name AND last_name = :last_name',
-                                         {"first_name":first_name, "last_name":last_name}).fetchone()
+                codename = row[6].strip()
                 if not db_contains(first_name, last_name, email):
                     try:
-                        db.execute('insert into customers (first_name, last_name, email, birth, entered) values (?, ?, ?, ?, ?)',
-                                   [first_name, last_name, email, birth,str(datetime.now())])
+                        db.execute('insert into customers (first_name, last_name, email, birth, sex, entered) values (?, ?, ?, ?, ?, ?)',[first_name, last_name, email, birth, sex ,str(datetime.now())])
+                        db.commit()        
+                        if activity == 'laser':
+                            field = 'codename'
+                            insert = codename
+                        elif activity == 'learnToSkate':
+                            field = 'skill'
+                            insert = '1' #***ALERT***
+                        else:
+                            raise_the_roof()
+                        id = db.execute('SELECT id FROM customers WHERE first_name=:first_name AND last_name=:last_name AND email=:email AND birth=:birth',{"first_name":first_name,"last_name":last_name,"email":email,"birth":birth}).fetchone()['id']
+                        command = 'INSERT INTO {0} ({1},customer_id) values (?,?)'.format(activity,field)
+                        db.execute(command,[insert,id])
                         db.commit()
                         unique += 1
                         # flash('New entry was successfully posted')
@@ -188,7 +208,7 @@ def add_players():
     if not session.get('logged_in'):
         redirect(url_for('login'))    
     request.files['file'].save('users_upload.csv')
-    bulk_upload('users_upload.csv')
+    bulk_upload('users_upload.csv',request.form['activity'])
     return redirect(url_for('register'))
 
 @app.route('/register', methods=['GET'])
@@ -221,32 +241,52 @@ def make_calendar():
 
 @app.route('/email/create',methods=['GET','POST'])
 def create_list():
-    selectors = ["email","first_name","last_name","birth","codename","entered","recent","activity"]
-    relation_map = lambda relation,criteria: {
-        "0":"LIKE \"%{0}%\"".format(criteria),
-        "1":"NOT LIKE \"%{0}%\"".format(criteria),
-        "2":"BETWEEN \"{0}\"".format(criteria),
-        "3":"BETWEEN \"{0}\"".format(criteria),
-        "4":"LIKE \"{0}%\"".format(criteria),
-        "5":"LIKE \"%{0}\"".format(criteria),
-        "6":"IS \"{0}\"".format(criteria),
-        "7":"IS NOT \"{0}\"".format(criteria)
+    form_where_clause = lambda column, relation, criteria: {
+        "0":"{0} LIKE \"%{1}%\"".format(column, criteria),
+        "1":"{0} NOT LIKE \"%{1}%\"".format(column, criteria),
+        "2":"{0} BETWEEN \"0\" AND \"{1}\"".format(column, criteria),
+        "3":"{0} BETWEEN \"{1}\" AND \"9999\"".format(column, criteria),
+        "4":"{0} LIKE \"{1}%\"".format(column, criteria),
+        "5":"{0} LIKE \"%{1}\"".format(column, criteria),
+        "6":"{0} IS \"{1}\"".format(column, criteria),
+        "7":"{0} IS NOT \"{1}\"".format(column, criteria),
+        "8":"strftime('%m', {0}) IS {1}" 
     }[relation]
-    create_search_command = \
-                            lambda table, selector, mapped_relation: \
-                            "SELECT * FROM {0} WHERE {1} {2}".format(table,selector,mapped_relation)
-    selector = selectors[int(request.form['base'])]
-    relation = request.form['relation']
-    criteria = request.form['criteria']        
-    mapped_relation = relation_map(relation,criteria)
-    command = create_search_command("CUSTOMERS",selector,mapped_relation)
-    db = get_db()
-    print(command)
+    selectors = ["email","first_name","last_name","birth","codename","entered","visit_time","activity"]
+    create_basic_search_command = \
+                                  lambda table, where_clause: \
+                                  "SELECT * FROM {0} WHERE {1}".format(table,where_clause)
+    create_join_search_command = \
+                                 lambda table1, table2, table1id, table2id, where_clause: \
+                                 "SELECT * FROM {0}, {1} WHERE ({0}.{2} = {1}.{3}) AND ({4})".format(table1,table2,table1id,table2id,where_clause)
     
+    selector = selectors[int(request.form['base'])]    
+    relation = request.form['relation']
+    if relation == "month":
+        criteria = request.form['month']
+        where_clause = form_where_clause(selector, relation, criteria)
+    elif selector == "activity":
+        criteria = request.form['activity']
+        where_clause = "1 IS 1"
+        joined_table = {
+            '0':'laser',
+            '1':'learnToSkate'
+        }[criteria]
+        joined_table_id = 'customer_id'
+    else:
+        criteria = request.form['criteria'].strip()
+        where_clause = form_where_clause(selector, relation, criteria)        
+
+    if selector in ['codename','visit_time','activity']:        
+        command = create_join_search_command("CUSTOMERS",joined_table,"id",joined_table_id,where_clause) 
+    else:
+        command = create_basic_search_command("CUSTOMERS",where_clause)
+    db = get_db()
+    print(command)    
     entries = db.execute(command).fetchall()
-    print("****ENTRIES****")
-    for entry in entries:
-        print(entries)
+    # print("****ENTRIES****")
+    # for entry in entries:
+    #     print(entries)    
     return render_template('email.html',entries=entries)
 
 @app.route('/email', methods=['GET','POST'])
