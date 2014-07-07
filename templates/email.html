@@ -8,7 +8,7 @@
     <div class="nav-page-title">
       <h3>Create a List</h3>
     </div>
-    <form action="{{ url_for('create_list') }}" method="post" class="add-entry" id="email-add-constraint">      
+    <form action="{{ url_for('create_list') }}" method="post" class="add-entry" id="email-search-form">      
       <div class="email-nav">
 	<div class="email-search-boxes" id="email-search-container">
 	</div>
@@ -17,9 +17,10 @@
 	</div>
 
 	<div  class="form-group">
-	  <input type=submit value="Search" class="btn btn-block btn-lg btn-customers submit-buttons btn-bar">
-	</div>
+	  <input type=submit value="Search" class="btn btn-block btn-lg btn-customers submit-buttons btn-bar" id="email-search-submit">
+	</div>     
       </div>   
+
     </form>
     {% endif %}
   <article id="main">
@@ -32,7 +33,7 @@
 
       <ul id="list" class="entries">
 	{% for entry in entries %}
-	<li id="li">  	  
+	<li name="customer-li">  	  
 
 	  <div class="left-li">{{ entry.first_name }} {{ entry.last_name}}	  
 	    <br>Email: {{ entry.email|safe }}
@@ -47,12 +48,11 @@
 	  {% else %}
 	  <li><em>Unbelievable.  No entries here so far</em>
 	    {% endfor %}	    
-	    <script>
-	     var pluralizer = function(num,word){ console.log(parseInt(num)); if (parseInt(num) < 2){return word;}else{ return word + "s";}}
-	     alertify.success({{ entries|length }} +" "+pluralizer({{ entries|length }},'customer') +" matched");
-	    </script>
 
       </ul>
+
     </div>
   </article>
+  
 {% endblock %}
+  

@@ -226,7 +226,7 @@ def login():
         else:
             session['logged_in'] = True
             flash('You were logged in')
-            return redirect(url_for('customers'))
+            return redirect(url_for('navigate'))
     return render_template('login.html', error=error)
 
 @app.route('/calendar')
@@ -241,6 +241,38 @@ def make_calendar():
 
 @app.route('/email/create',methods=['GET','POST'])
 def create_list():
+    my_dict = {}
+    for item in request.form: 
+        if item[:-1] == "base":
+            base_value = request.form[item]
+            relation_value = request.form['relation{0}'.format(item[-1])]
+            if base_value == "7":
+                criteria_value = request.form['activity{0}'.format(item[-1])]
+            elif relation_value == "8":
+                criteria_value = request.form['month{0}'.format(item[-1])]
+            else:
+                criteria_value = request.form['criteria{0}'.format(item[-1])]
+            my_dict[item] = (base_value,relation_value,criteria_value)        
+    search_tables = {
+        'customers':True, #Always access customers?
+        'laser':False,
+        'learnToSkate':False,
+        'visit':False
+    }
+    for query,values in my_dict.iteritems():
+        selector = values[0]
+        criteria = values[2]
+        if selector == "4":
+            search_tables['laser'] = True
+        elif selector == "6":
+            search_tables['visit'] = True
+        elif selector == "7":
+            if criteria == "0":
+                search_tables['laser'] = True
+            elif criteria == "1":
+                search_tables['learnToSkate'] = True
+    
+            
     form_where_clause = lambda column, relation, criteria: {
         "0":"{0} LIKE \"%{1}%\"".format(column, criteria),
         "1":"{0} NOT LIKE \"%{1}%\"".format(column, criteria),
@@ -252,6 +284,7 @@ def create_list():
         "7":"{0} IS NOT \"{1}\"".format(column, criteria),
         "8":"strftime('%m', {0}) IS {1}" 
     }[relation]
+    
     selectors = ["email","first_name","last_name","birth","codename","entered","visit_time","activity"]
     create_basic_search_command = \
                                   lambda table, where_clause: \
@@ -259,14 +292,28 @@ def create_list():
     create_join_search_command = \
                                  lambda table1, table2, table1id, table2id, where_clause: \
                                  "SELECT * FROM {0}, {1} WHERE ({0}.{2} = {1}.{3}) AND ({4})".format(table1,table2,table1id,table2id,where_clause)
-    
-    selector = selectors[int(request.form['base'])]    
-    relation = request.form['relation']
-    if relation == "month":
+
+    def create_command(search_tables,queries):
+        command = "SELECT * FROM "
+        for key in search_tables:
+            if search_tables[key]:
+                command += key + ", "
+        command += "WHERE "
+        # for key in search_tables:
+            
+        # print(command[:-2])
+    print(my_dict)
+    print(search_tables)
+    print("CALLING CREATE")
+    create_command(search_tables,my_dict)
+    print("END CREATE")
+    selector = selectors[int(my_dict['base0'][0])]    
+    relation = my_dict['base0'][1]
+    if relation == "8": #if relation is month
         criteria = request.form['month']
         where_clause = form_where_clause(selector, relation, criteria)
     elif selector == "activity":
-        criteria = request.form['activity']
+        criteria = my_dict['base0'][2]
         where_clause = "1 IS 1"
         joined_table = {
             '0':'laser',
@@ -276,7 +323,6 @@ def create_list():
     else:
         criteria = request.form['criteria'].strip()
         where_clause = form_where_clause(selector, relation, criteria)        
-
     if selector in ['codename','visit_time','activity']:        
         command = create_join_search_command("CUSTOMERS",joined_table,"id",joined_table_id,where_clause) 
     else:

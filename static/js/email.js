@@ -7,17 +7,23 @@ if(typeof(String.prototype.trim) === "undefined")
 }
 
 function validateListForm(){
-  console.log("CALLINg");
-    var criteriaTextBoxDiv = document.getElementById('criteria');
-    var criteriaText = criteriaTextBoxDiv.children[0].value;       
-    if (criteriaTextBoxDiv.style.display !== "none" && (criteriaText.trim() === '')) {
-	return false;
+  console.log("validating");
+  var criteriaTextInputs = document.getElementsByName('criteria');  
+  console.log(criteriaTextInputs);
+  for (var box = 0; box < criteriaTextInputs.length; box++){
+    var parentStyle = criteriaTextInputs[box].parentNode.style.display;
+    if ((criteriaTextInputs[box].value.trim() === '') && (parentStyle !== "none")){      
+      alertify.error("Text forms can't be empty");
+      return false;
     }
-    return true; 
+  }
+  console.log("happening");
+  localStorage.setItem('search', document.getElementById('email-search-container').innerHTML);
+  alertify.success("You have saved your search.");
+  return true;
 }
 
 function handleBase(num){
-  console.log("clicked handle base and num = " + num);
   var baseDropdown = document.getElementById('email-base'+num);
   var currentValue = baseDropdown.options[baseDropdown.selectedIndex].value; 
   var activityDropdown = document.getElementById('activity'+num);
@@ -51,7 +57,7 @@ function handleBase(num){
     case "7":
       alterOptions(relationDropdown,true);
       relationDropdown.options[6].disabled = false;
-      relationDropdown.options[7].disabled = false;
+      /* relationDropdown.options[7].disabled = false; */ // ***ALERT*** Will implement later
       relationDropdown.value = 6;
       activityDropdown.style.display = "inline-block";
       criteriaText.style.display = "none";	 
@@ -61,10 +67,12 @@ function handleBase(num){
       alterOptions(relationDropdown,false);
       activityDropdown.style.display = "none";
       criteriaText.style.display = "inline-block";
+      break;
   }
+  handleRelation(num);
 }
+
 function handleRelation(num){
-  console.log("clicked handle relation and num = " + num);
   var relationDropdown = document.getElementById('email-relation'+num);
   var relationValue = relationDropdown.options[relationDropdown.selectedIndex].value;
   var monthDropdown = document.getElementById('month'+num);
@@ -81,6 +89,21 @@ function handleRelation(num){
   }     
 }
 
+function deleteSearchRow(num){
+  console.log("deleted row: " + num);  
+  var rowContainer = document.getElementById("email-search-container");  
+  var numRows = document.getElementsByName("search-row").length;
+  var row = document.getElementById("search-row"+num);
+  console.log("numRows"+numRows);
+  if (numRows > 1){
+    $('#search-row'+num).animo( {animation: "fadeOutRight", duration: 0.25, keep: true}, 
+				function() { 
+      $('#search-row'+num).remove();
+    });
+  } else {    
+    alertify.error("You must have at least one search criteria");
+  }    
+}
 function deleteParentListElement(el){
     parent = el.parentNode.parentNode;
     numElements = parent.parentNode.getElementsByTagName("li").length;
@@ -89,6 +112,7 @@ function deleteParentListElement(el){
     } else {
 	alertify.error("You can't delete the last person. Use Clear All");
     }
+  return false;
 } 
 
 function makeEditable(el){
@@ -99,24 +123,27 @@ function makeEditable(el){
     if ($(leftDiv).attr("contenteditable") === "false" || $(leftDiv).attr("contenteditable") === undefined) {
 	$(leftDiv).attr("contenteditable",true);
 	$(editButton).attr("value","save");     
+        $(leftDiv).focus();
     } else {
 	$(leftDiv).attr("contenteditable",false);
 	$(editButton).attr("value","edit");     
     }
 }
 
-function loadToDo() {    
-    if (localStorage.getItem('todoList')){
-	list.innerHTML = localStorage.getItem('todoList'); 
-    };
+function loadToDo() {  
+  if (localStorage.getItem('customerList')){
+    $('#list').prepend(localStorage.getItem('customerList'));
+  };
+  var numCustomersTotal = document.getElementsByName('customer-li').length
+  alertify.success( numCustomersTotal + " "+pluralizer(numCustomersTotal,'customer') +" matched");
 }
+var pluralizer = function(num,word){ if (parseInt(num) < 2){return word;}else{ return word + "s";}}
 
 var rowNumber = 0;
 function addSearchRow(){
-  rowContainer = document.getElementById('email-search-container');  
   var searchRow = "<div class=\"search-row\" name=\"search-row\" id=\"search-row"+rowNumber+"\">"
   +" <div  class=\"form-group form-group-inline\">"
-  + " <select name=\"base\" class=\"form-control\" id=\"email-base"+rowNumber+"\" onchange=handleBase("+rowNumber+")>"
+  + " <select name=\"base"+rowNumber+"\" class=\"form-control\" id=\"email-base"+rowNumber+"\" onchange=handleBase("+rowNumber+")>"
   + " <option value=\"0\">Email Address</option>"
   + " <option value=\"1\">First Name</option>"
   + " <option value=\"2\">Last Name</option>"
@@ -128,7 +155,7 @@ function addSearchRow(){
   + " </select>"
   + " </div>"
   + " <div class=\"form-group form-group-inline\">"
-  + " <select name=\"relation\" class=\"form-control\" id=\"email-relation"+rowNumber+"\" onchange=handleRelation("+rowNumber+")>"
+  + " <select name=\"relation"+rowNumber+"\" class=\"form-control\" id=\"email-relation"+rowNumber+"\" onchange=handleRelation("+rowNumber+")>"
   + " <option value=\"0\">contains</option>"
   + " <option value=\"1\">does not contain</option>"
   + " <option value=\"2\">before</option>"
@@ -141,7 +168,7 @@ function addSearchRow(){
   + " </select>"
   + " </div>	"
   + " <div style=\"display:none;\" class=\"form-group form-group-inline\" id=\"activity"+rowNumber+"\">"
-  + " <select name=\"activity\" class=\"form-control\">"
+  + " <select name=\"activity"+rowNumber+"\" class=\"form-control\">"
   + " <option value=\"0\">Laserstrike</option>"
   + " <option value=\"1\">Learn to Skate</option>"
   + " <option value=\"2\">Youth Hockey</option>"
@@ -150,7 +177,7 @@ function addSearchRow(){
   + " </select>"
   + " </div>	"
   + " <div style=\"display:none;\" class=\"form-group form-group-inline\" id=\"month"+rowNumber+"\">"
-  + " <select name=\"month\" class=\"form-control\">"
+  + " <select name=\"month"+rowNumber+"\" class=\"form-control\">"
   + " <option value=\"1\">January</option>"
   + " <option value=\"2\">February</option>"
   + " <option value=\"3\">March</option>"
@@ -166,38 +193,47 @@ function addSearchRow(){
   + " </select>"
   + " </div>"
   + " <div class=\"form-group form-group-inline\" id=\"criteria"+rowNumber+"\">"
-  + " <input type=\"text\" size=20 name=\"criteria\" class=\"form-control form-control-inline\">"
+  + " <input type=\"text\" size=20 name=\"criteria"+rowNumber+"\" class=\"form-control form-control-inline\">"
   + " </div>" 
   +"<div class=\"form-group form-control-inline\">"
-  + "<button class=\"btn btn-block btn-lg btn-danger btn-remove-row btn-bar\"><span class=\"fui-cross\"></span></button>"
+  + "<button type=button onclick=\"deleteSearchRow("+rowNumber+");\" class=\"btn btn-block btn-lg btn-danger btn-remove-row btn-bar\" id=\"delete-row"+rowNumber+"\"><span class=\"fui-cross\"></span></button>"
   +"</div>"
   + " </div>"
 
-  rowContainer.innerHTML = rowContainer.innerHTML + searchRow;
+  $('#email-search-container').append(searchRow);
   newBase = document.getElementById("email-base" + rowNumber);
   newRelation = document.getElementById("email-relation" + rowNumber);
+  handleBase(rowNumber);
+  if (rowNumber > 0){
+    $('#add-search-boxes').unbind('click');
+    $('#search-row'+rowNumber).animo( { animation: 'bounceInRight', duration: 1 }, function() {
+      $('#add-search-boxes').bind('click',addSearchRow); console.log("called rebind");
+    });    
+  }  
   rowNumber += 1;  
 }
 
 $(document).ready(function() {
-    var list = document.getElementById('list');
-    $("#saveAll").click(function(e) {
-	e.preventDefault();
-	localStorage.setItem('todoList', list.innerHTML);
-	alertify.success("You have saved your list.");
-    });
+  var list = document.getElementById('list');
+  $("#saveAll").click(function(e) {
+    e.preventDefault();
+    localStorage.setItem('customerList', list.innerHTML);
+    alertify.success("You have saved your list.");
+  });
   /* $('#email-base').change(handleBase);
   /* REMOVE LATER ***ALERT*** */
   /* $('#email-base option[value=\"6\"]').prop('disabled',true); */
   /****************************/     
   /* $('#email-relation').change(handleRelation); */ 
-    $("#clearAll").click(function(e) {
-	e.preventDefault();
-	localStorage.clear();
-	window.location.href = "/email";
-    });   
-    loadToDo();  
+  $("#clearAll").click(function(e) {
+    e.preventDefault();
+    localStorage.clear();
+    window.location.href = "/email";
+  });   
+  
+  
+  loadToDo();  
   $('#add-search-boxes').click(addSearchRow);  
   addSearchRow();
-  /* $('#email-add-constraint').submit(validateListForm); */
-});
+  $('#email-search-form').submit(validateListForm);
+}); 
