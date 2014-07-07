@@ -22,7 +22,7 @@ from parse_csv import CSV_to_dict as dictize
 
 
 # configuration
-DATABASE = './db/emailer.db'
+DATABASE = './db/ice.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
@@ -60,7 +60,7 @@ def get_db():
         top.sqlite_db = sqlite_db
     return top.sqlite_db
 
-def db_contains(first_name,last_name,email):
+def db_contains(first_name,last_name,email,verbose=False):
     db = get_db()
     if email == "":
         already = db.execute('SELECT * FROM customers WHERE (first_name=:first_name AND last_name=:last_name)',
@@ -70,15 +70,16 @@ def db_contains(first_name,last_name,email):
                          {"first_name":first_name, "last_name":last_name,"email":email}).fetchone()
     
     if already is not None:
-        already_entered = 'Person already entered into the database'
-        print(already_entered + \
-        '\nName:{0} {1}\
-        \nEntered:{2}'\
-        .format(already['first_name'],
-                already['last_name'],
-                already['entered']))
-        return True
-    return False
+        if verbose:
+            already_entered = 'Person already entered into the database'
+            print(already_entered + \
+                  '\nName:{0} {1}\
+                  \nEntered:{2}'\
+                  .format(already['first_name'],
+                          already['last_name'],
+                          already['entered']))
+        return (True, already['id'])
+    return (False,None)
 
     
 @app.teardown_appcontext
@@ -162,8 +163,7 @@ def bulk_upload(addr,activity):
         unique = 0
         def raise_the_roof():
             raise IntegrityError('Skating and hockey tables not yet supported')        
-        print(activity)
-        if activity not in ['0']: raise_the_roof()
+        if activity not in ['0','1']: raise_the_roof()
         activity_dict = {'0':'laser','1':'learnToSkate'}
         activity = activity_dict[activity]
         for row in reader:   # iterates the rows of the file in order
@@ -177,8 +177,10 @@ def bulk_upload(addr,activity):
                 sex = row[2].strip().title()
                 email = row[4].strip()   
                 birth = row[3].strip()
+                visit_time = row[5].strip()
                 codename = row[6].strip()
-                if not db_contains(first_name, last_name, email):
+                contains,id = db_contains(first_name, last_name, email)
+                if not contains:
                     try:
                         db.execute('insert into customers (first_name, last_name, email, birth, sex, entered) values (?, ?, ?, ?, ?, ?)',[first_name, last_name, email, birth, sex ,str(datetime.now())])
                         db.commit()        
@@ -193,11 +195,22 @@ def bulk_upload(addr,activity):
                         id = db.execute('SELECT id FROM customers WHERE first_name=:first_name AND last_name=:last_name AND email=:email AND birth=:birth',{"first_name":first_name,"last_name":last_name,"email":email,"birth":birth}).fetchone()['id']
                         command = 'INSERT INTO {0} ({1},customer_id) values (?,?)'.format(activity,field)
                         db.execute(command,[insert,id])
+                        command = 'INSERT INTO visit (visit_time,customer_id) values (?,?)'
+                        db.execute(command,[visit_time,id])
                         db.commit()
                         unique += 1
-                        # flash('New entry was successfully posted')
                     except IntegrityError:                        
                         flash('Name fields, and email cannot be empty')
+                else:
+                    command = 'INSERT INTO visit (visit_time,customer_id) values (?,?)'
+                    contains = True if db.execute('SELECT visit.visit_id FROM visit WHERE visit_time=:visit_time AND customer_id=:id',{"visit_time":visit_time,"id":id}).fetchone() is not None else False
+                    if contains:
+                        print(db.execute('SELECT * FROM visit,customers WHERE visit_time=:visit_time AND customer_id=:id AND (customers.id=visit.customer_id)',{"visit_time":visit_time,"id":id}).fetchone())
+                    if not contains:
+                        db.execute(command,[visit_time,id])
+                        db.commit()
+                        
+                    
     finally:
         f.close()      # closing    
     flash('{0} uploaded!'.format(unique))
@@ -283,76 +296,48 @@ def create_list():
         select = "SELECT * FROM customers, "
         where = " WHERE "
         selectors = ["email","first_name","last_name","birth","codename","entered","visit_time","activity"]    
+        laser = 'laser'
+        visit = 'visit'
+        learnToSkate = 'learnToSkate'
+        customers = "customers"
         for query,values in queries.iteritems():
-            selector = values[0]
+            selector = selectors[int(values[0])]
             relation = values[1]
             criteria = values[2]
-            laser = 'laser'
-            visit = 'visit'
-            learnToSkate = 'learnToSkate'
-            if selector == "4":
+            if selector == "codename":
                 if not search_tables[laser]:
                     search_tables[laser] = True
                     select += laser + ", " 
                     where += "(customers.id={0}.customer_id) AND ".format(laser)                                              
-                where += form_where_clause("{0}.{1}".format(laser,selectors[int(selector)]),relation,criteria) + " AND "
-            elif selector == "6":
+                where += form_where_clause("{0}.{1}".format(laser,selector),relation,criteria) + " AND "
+            elif selector == "visit_time":
                 if not search_tables[visit]:
                     search_tables[visit] = True
                     select += visit + ", "                
                     where += "(customers.id={0}.customer_id) AND ".format(visit)                       
-                where += form_where_clause("{0}.{1}".format(visit,selectors[int(selector)]),relation,criteria)  + " AND "
-            elif selector == "7":
-                if criteria == "0":
+                where += form_where_clause("{0}.{1}".format(visit,selector),relation,criteria)  + " AND "
+            elif selector == "activity":
+                if criteria == "0": #Laserstrike
                     if not search_tables[laser]:
                         search_tables[laser] = True
                         select += laser + ", "                
                         where += "(customers.id={0}.customer_id) AND ".format(laser)                               
-                    # where += form_where_clause("{0}.{1}".format(visit,selectors[int(selector)]),relation,criteria) + " AND "
-                elif criteria == "1":
+                elif criteria == "1": #Learn to skate
                     if not search_tables[learnToSkate]:
                         search_tables[learnToSkate] = True
                         select += learnToSkate + ", "
                         where += "(customers.id={0}.customer_id) AND ".format(learnToSkate)                               
-                    # where += form_where_clause("{0}.{1}".format(visit,selectors[int(selector)]),relation,criteria) + " AND "
             else:
-                customers = "customers"
+
                 where += form_where_clause("{0}.{1}".format(customers,selectors[int(selector)]),relation,criteria) + " AND "
-        command = select[:-2] +  where[:-4]
-        
-        print("QUERIES",queries)
+        command = select[:-2] +  where[:-4]        
         return command
-    # print(my_dict)
-    # print(search_tables)
-    # selector = selectors[int(my_dict['base0'][0])]    
-    # relation = my_dict['base0'][1]
-    # if relation == "8": #if relation is month
-    #     criteria = request.form['month']
-    #     where_clause = form_where_clause(selector, relation, criteria)
-    # elif selector == "activity":
-    #     criteria = my_dict['base0'][2]
-    #     where_clause = "1 IS 1"
-    #     joined_table = {
-    #         '0':'laser',
-    #         '1':'learnToSkate'
-    #     }[criteria]
-    #     joined_table_id = 'customer_id'
-    # else:
-    #     criteria = request.form['criteria'].strip()
-    #     where_clause = form_where_clause(selector, relation, criteria)        
-    # if selector in ['codename','visit_time','activity']:        
-    #     command = create_join_search_command("CUSTOMERS",joined_table,"id",joined_table_id,where_clause) 
-    # else:
-    #     command = create_basic_search_command("CUSTOMERS",where_clause)
     command = create_command(search_tables,my_dict)
     print("CALLING CREATE")
     print(command)
     print("END CREATE")
     db = get_db()
     entries = db.execute(command).fetchall()
-    # print("****ENTRIES****")
-    # for entry in entries:
-    #     print(entries)    
     return render_template('email.html',entries=entries)
 
 @app.route('/email', methods=['GET','POST'])

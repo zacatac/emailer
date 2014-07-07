@@ -1,0 +1,5 @@
+-- Selecting visits by customer
+SELECT  customers.first_name, customers.last_name, 
+ GROUP_CONCAT(visit.visit_time) AS 'time'
+FROM customers JOIN visit WHERE visit.customer_id = customers.id
+GROUP BY customers.id;

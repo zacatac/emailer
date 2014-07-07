@@ -7,9 +7,7 @@ if(typeof(String.prototype.trim) === "undefined")
 }
 
 function validateListForm(){
-  console.log("validating");
-  var criteriaTextInputs = document.getElementsByName('criteria');  
-  console.log(criteriaTextInputs);
+  var criteriaTextInputs = $('[name^=criteria]');  
   for (var box = 0; box < criteriaTextInputs.length; box++){
     var parentStyle = criteriaTextInputs[box].parentNode.style.display;
     if ((criteriaTextInputs[box].value.trim() === '') && (parentStyle !== "none")){      
@@ -17,7 +15,6 @@ function validateListForm(){
       return false;
     }
   }
-  console.log("happening");
   localStorage.setItem('search', document.getElementById('email-search-container').innerHTML);
   alertify.success("You have saved your search.");
   return true;
@@ -116,18 +113,26 @@ function deleteParentListElement(el){
 } 
 
 function makeEditable(el){
-    var divs = el.parentNode.parentNode.getElementsByTagName('div');
-    var leftDiv = divs[0];
-    var rightDiv = divs[1];
-    var editButton = rightDiv.getElementsByTagName('input')[0] 
-    if ($(leftDiv).attr("contenteditable") === "false" || $(leftDiv).attr("contenteditable") === undefined) {
-	$(leftDiv).attr("contenteditable",true);
-	$(editButton).attr("value","save");     
-        $(leftDiv).focus();
-    } else {
-	$(leftDiv).attr("contenteditable",false);
-	$(editButton).attr("value","edit");     
+  var leftDiv = $(el).parents().prev('.left-li');
+  var rightDiv= $(el).closest('.right-li');
+  var editButton = rightDiv.children('input');
+  var change_to_edit = true;
+  $(el).parents().prev('.left-li').children('[class^=customer]').each(function (index) {
+    console.log("caller: " + index);
+    var this_span = $(this).children('span');
+    if (this_span.attr("contenteditable") === "false" || this_span.attr("contenteditable") === undefined){
+      this_span.attr("contenteditable",true);
+      change_to_edit = false;
     }
+    else {
+      this_span.attr("contenteditable",false);
+    }
+  });
+  if (change_to_edit === true){
+    $(editButton).attr("value","edit");     
+  } else {
+    $(editButton).attr("value","save");     
+  }
 }
 
 function loadToDo() {  
@@ -213,6 +218,31 @@ function addSearchRow(){
   rowNumber += 1;  
 }
 
+function exportData(list){
+  exportList = "First Name, Last Name, Email, Birthdate \n"
+  list.children($('li')).each(
+    function (index) {
+      $(this).children('.left-li').children('[class^=customer]').each(
+	function (index) {
+	  exportList += $(this).children('span').text().trim() + ",";
+	});
+      exportList = exportList.slice(0,-1);
+      exportList += "\n";	
+    });
+  var a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style = "display: none";
+  function saveData(data, fileName) {
+    blob = new Blob([data], {type: "octet/stream"});
+    url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+  saveData(exportList,"example.csv")  
+}
+
 $(document).ready(function() {
   var list = document.getElementById('list');
   $("#saveAll").click(function(e) {
@@ -230,6 +260,9 @@ $(document).ready(function() {
     localStorage.clear();
     window.location.href = "/email";
   });   
+  $("#exportAll").click(function(e) {
+    exportData($("#list"));
+  });
   
   
   loadToDo();  

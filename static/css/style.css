@@ -37,7 +37,6 @@ h2              { font-size: 1.2em; }
     text-align:center;
 }
 
-
 #sample{
     position: relative; left:-200px;
     margin: 0 auto;
@@ -122,6 +121,12 @@ h2              { font-size: 1.2em; }
     width: 225px;
 }
 
+/* Email pages */
+.customer-firstname, .customer-lastname{
+    display:inline-block;
+}
+
+/* End */
 
 .nav-page-title{
     text-align: center;
