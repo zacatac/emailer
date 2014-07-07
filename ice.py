@@ -254,38 +254,24 @@ def create_list():
                 criteria_value = request.form['criteria{0}'.format(item[-1])]
             my_dict[item] = (base_value,relation_value,criteria_value)        
     search_tables = {
-        'customers':True, #Always access customers?
         'laser':False,
         'learnToSkate':False,
         'visit':False
     }
-    for query,values in my_dict.iteritems():
-        selector = values[0]
-        criteria = values[2]
-        if selector == "4":
-            search_tables['laser'] = True
-        elif selector == "6":
-            search_tables['visit'] = True
-        elif selector == "7":
-            if criteria == "0":
-                search_tables['laser'] = True
-            elif criteria == "1":
-                search_tables['learnToSkate'] = True
     
-            
     form_where_clause = lambda column, relation, criteria: {
-        "0":"{0} LIKE \"%{1}%\"".format(column, criteria),
-        "1":"{0} NOT LIKE \"%{1}%\"".format(column, criteria),
-        "2":"{0} BETWEEN \"0\" AND \"{1}\"".format(column, criteria),
-        "3":"{0} BETWEEN \"{1}\" AND \"9999\"".format(column, criteria),
-        "4":"{0} LIKE \"{1}%\"".format(column, criteria),
-        "5":"{0} LIKE \"%{1}\"".format(column, criteria),
-        "6":"{0} IS \"{1}\"".format(column, criteria),
-        "7":"{0} IS NOT \"{1}\"".format(column, criteria),
-        "8":"strftime('%m', {0}) IS {1}" 
+        "0":"({0} LIKE \"%{1}%\")".format(column, criteria),
+        "1":"({0} NOT LIKE \"%{1}%\")".format(column, criteria),
+        "2":"({0} BETWEEN \"0\" AND \"{1}\")".format(column, criteria),
+        "3":"({0} BETWEEN \"{1}\" AND \"9999\")".format(column, criteria),
+        "4":"({0} LIKE \"{1}%\")".format(column, criteria),
+        "5":"({0} LIKE \"%{1}\")".format(column, criteria),
+        "6":"({0} IS \"{1}\")".format(column, criteria),
+        "7":"({0} IS NOT \"{1}\")".format(column, criteria),
+        "8":"(strftime('%m', {0}) IS \"{1}\")".format(column,"{0}".format(criteria).zfill(2)) 
     }[relation]
     
-    selectors = ["email","first_name","last_name","birth","codename","entered","visit_time","activity"]
+    selectors = ["email","first_name","last_name","birth","codename","entered","visit_time","activity"]    
     create_basic_search_command = \
                                   lambda table, where_clause: \
                                   "SELECT * FROM {0} WHERE {1}".format(table,where_clause)
@@ -294,41 +280,75 @@ def create_list():
                                  "SELECT * FROM {0}, {1} WHERE ({0}.{2} = {1}.{3}) AND ({4})".format(table1,table2,table1id,table2id,where_clause)
 
     def create_command(search_tables,queries):
-        command = "SELECT * FROM "
-        for key in search_tables:
-            if search_tables[key]:
-                command += key + ", "
-        command += "WHERE "
-        # for key in search_tables:
-            
-        # print(command[:-2])
-    print(my_dict)
-    print(search_tables)
+        select = "SELECT * FROM customers, "
+        where = " WHERE "
+        selectors = ["email","first_name","last_name","birth","codename","entered","visit_time","activity"]    
+        for query,values in queries.iteritems():
+            selector = values[0]
+            relation = values[1]
+            criteria = values[2]
+            laser = 'laser'
+            visit = 'visit'
+            learnToSkate = 'learnToSkate'
+            if selector == "4":
+                if not search_tables[laser]:
+                    search_tables[laser] = True
+                    select += laser + ", " 
+                    where += "(customers.id={0}.customer_id) AND ".format(laser)                                              
+                where += form_where_clause("{0}.{1}".format(laser,selectors[int(selector)]),relation,criteria) + " AND "
+            elif selector == "6":
+                if not search_tables[visit]:
+                    search_tables[visit] = True
+                    select += visit + ", "                
+                    where += "(customers.id={0}.customer_id) AND ".format(visit)                       
+                where += form_where_clause("{0}.{1}".format(visit,selectors[int(selector)]),relation,criteria)  + " AND "
+            elif selector == "7":
+                if criteria == "0":
+                    if not search_tables[laser]:
+                        search_tables[laser] = True
+                        select += laser + ", "                
+                        where += "(customers.id={0}.customer_id) AND ".format(laser)                               
+                    # where += form_where_clause("{0}.{1}".format(visit,selectors[int(selector)]),relation,criteria) + " AND "
+                elif criteria == "1":
+                    if not search_tables[learnToSkate]:
+                        search_tables[learnToSkate] = True
+                        select += learnToSkate + ", "
+                        where += "(customers.id={0}.customer_id) AND ".format(learnToSkate)                               
+                    # where += form_where_clause("{0}.{1}".format(visit,selectors[int(selector)]),relation,criteria) + " AND "
+            else:
+                customers = "customers"
+                where += form_where_clause("{0}.{1}".format(customers,selectors[int(selector)]),relation,criteria) + " AND "
+        command = select[:-2] +  where[:-4]
+        
+        print("QUERIES",queries)
+        return command
+    # print(my_dict)
+    # print(search_tables)
+    # selector = selectors[int(my_dict['base0'][0])]    
+    # relation = my_dict['base0'][1]
+    # if relation == "8": #if relation is month
+    #     criteria = request.form['month']
+    #     where_clause = form_where_clause(selector, relation, criteria)
+    # elif selector == "activity":
+    #     criteria = my_dict['base0'][2]
+    #     where_clause = "1 IS 1"
+    #     joined_table = {
+    #         '0':'laser',
+    #         '1':'learnToSkate'
+    #     }[criteria]
+    #     joined_table_id = 'customer_id'
+    # else:
+    #     criteria = request.form['criteria'].strip()
+    #     where_clause = form_where_clause(selector, relation, criteria)        
+    # if selector in ['codename','visit_time','activity']:        
+    #     command = create_join_search_command("CUSTOMERS",joined_table,"id",joined_table_id,where_clause) 
+    # else:
+    #     command = create_basic_search_command("CUSTOMERS",where_clause)
+    command = create_command(search_tables,my_dict)
     print("CALLING CREATE")
-    create_command(search_tables,my_dict)
+    print(command)
     print("END CREATE")
-    selector = selectors[int(my_dict['base0'][0])]    
-    relation = my_dict['base0'][1]
-    if relation == "8": #if relation is month
-        criteria = request.form['month']
-        where_clause = form_where_clause(selector, relation, criteria)
-    elif selector == "activity":
-        criteria = my_dict['base0'][2]
-        where_clause = "1 IS 1"
-        joined_table = {
-            '0':'laser',
-            '1':'learnToSkate'
-        }[criteria]
-        joined_table_id = 'customer_id'
-    else:
-        criteria = request.form['criteria'].strip()
-        where_clause = form_where_clause(selector, relation, criteria)        
-    if selector in ['codename','visit_time','activity']:        
-        command = create_join_search_command("CUSTOMERS",joined_table,"id",joined_table_id,where_clause) 
-    else:
-        command = create_basic_search_command("CUSTOMERS",where_clause)
     db = get_db()
-    print(command)    
     entries = db.execute(command).fetchall()
     # print("****ENTRIES****")
     # for entry in entries:
@@ -347,8 +367,6 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('navigate'))
-
-
 
 if __name__ == '__main__':
     try:

@@ -9,6 +9,8 @@ CREATE TABLE customers (
   entered TEXT NOT NULL
 );
 
+-- All references to customers.id in later tables must be 
+-- called "customer_id"
 create TABLE laser (       
   laserid INTEGER PRIMARY KEY autoincrement,
   codename TEXT,
