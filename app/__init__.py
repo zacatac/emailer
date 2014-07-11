@@ -4,12 +4,18 @@ from flask import Flask
 from flask.ext.assets import Environment, Bundle
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 from flask.ext.cache import Cache
+from flask.ext.babel import Babel
+
 
 # from app import assets
 from database import db
 
 # Setup flask cache
 cache = Cache()
+
+# init Flask-Babel
+babel = Babel()
+
 
 # init flask assets
 assets_env = Environment()
@@ -38,6 +44,15 @@ def create_app(object_name, env="development"):
     #init SQLAlchemy
     db.init_app(app)
 
+    # init Babel
+    babel.init_app(app)
+
+    @babel.localeselector
+    def get_locale():
+        translations = [str(translation) for translation in babel.list_translations()]
+        return request.accept_languages.best_match(translations)
+
+    
     # import and register the different asset bundles
     # assets_env.init_app(app)
     # assets_loader = PythonAssetsLoader(assets)
