@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask
-from flask_assets import Environment
+from flask.ext.assets import Environment
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 from flask.ext.cache import Cache
 
