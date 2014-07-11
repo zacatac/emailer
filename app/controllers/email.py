@@ -9,6 +9,7 @@ email = Blueprint('email', __name__)
 @email.route('/email/create',methods=['GET','POST'])
 def multi_search():
     search_dict = {}
+    print(request.form)
     for item in request.form: 
         if item[:-1] == "base":
             base_value = request.form[item]
@@ -19,8 +20,9 @@ def multi_search():
                 criteria_value = request.form['month{0}'.format(item[-1])]
             else:
                 criteria_value = request.form['criteria{0}'.format(item[-1])]
-                search_dict[item] = (base_value,relation_value,criteria_value)        
+            search_dict[item] = (base_value,relation_value,criteria_value)        
     command = create_command(search_dict)
+    print(command)
     entries = db.engine.execute(command).fetchall()
     return render_template('email.html',entries=entries)
 

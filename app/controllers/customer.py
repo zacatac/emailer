@@ -1,8 +1,9 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack, jsonify, Blueprint
-from util import bulk_upload
+from util import bulk_upload, upload
 from app import cache
 from database import db
+from datetime import datetime
 
 customer = Blueprint('customer', __name__)
 

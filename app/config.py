@@ -9,8 +9,9 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     SECRET_KEY = 'development key'
-    DATABASE = '/db/dev.db'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////' + ABSOLUTE_PATH + DATABASE    
+    DATABASE_DIRECTORY = 'db'
+    DATABASE = 'dev.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE)    
     DEBUG = True
     # SQLALCHEMY_ECHO = True
     CACHE_TYPE = 'null'
@@ -21,12 +22,12 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     SECRET_KEY = 'testing key'
     DATABASE = '/db/test.db'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////' + ABSOLUTE_PATH + DATABASE    
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + ABSOLUTE_PATH + DATABASE    
     TESTING = True
 
 class ProductionConfig(Config):
     SECRET_KEY = 'testing key'
     CACHE_TYPE = 'simple'
     DATABASE = '/db/ice.db'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////' + ABSOLUTE_PATH + DATABASE    
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + ABSOLUTE_PATH + DATABASE    
     

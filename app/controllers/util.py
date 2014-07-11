@@ -78,13 +78,15 @@ def bulk_upload(addr,activity):
         unique = 0
         if activity not in ['0','1']: raise_the_roof()
         activity_dict = {'0':'laser','1':'learnToSkate'}
-        activity = activity_dict[activity]        
+        activity = activity_dict[activity]       
+        db.engine.execute('BEGIN') 
         for row in reader:   # iterates the rows of the file in order
             rows += 1
             if header:
                 header = False
             else:
                 if upload(row,activity): unique += 1
+        db.engine.execute('END')
     finally:
         f.close()      # closing    
     return unique
@@ -116,6 +118,7 @@ def create_command(queries):
     visit = 'visit'
     learnToSkate = 'learnToSkate'
     customers = "customer"
+    print(queries)
     for query,values in queries.iteritems():
         selector = selectors[int(values[0])]
         relation = values[1]
@@ -137,12 +140,12 @@ def create_command(queries):
                 if not search_tables[laser]:
                     search_tables[laser] = True
                     select += laser + ", "                
-                    where += "(customer.id={0}.customer_id) AND ".format(laser)                               
+                where += "(customer.id={0}.customer_id) AND ".format(laser)                               
             elif criteria == "1": #Learn to skate
                 if not search_tables[learnToSkate]:
                     search_tables[learnToSkate] = True
                     select += learnToSkate + ", "
-                    where += "(customer.id={0}.customer_id) AND ".format(learnToSkate)                               
+                where += "(customer.id={0}.customer_id) AND ".format(learnToSkate)                               
         else:            
             where += form_where_clause("{0}.{1}".format(customers,selector),relation,criteria) + " AND "
     command = select[:-2] +  where[:-4]        

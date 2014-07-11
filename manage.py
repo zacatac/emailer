@@ -27,7 +27,7 @@ def createdb():
     """ Creates a database with all of the tables defined in
         your Alchemy models
     """
-
+    print(app.config['SQLALCHEMY_DATABASE_URI'])
     db.create_all()
 
 if __name__ == "__main__":
