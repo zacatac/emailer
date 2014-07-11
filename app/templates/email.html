@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+  <script src="/static/js/email.js"></script>    
+    <script language="javascript">
+    </script>
+
+    <div class="nav-page-title">
+      <h3>Create a List</h3>
+    </div>
+    <form action="{{ url_for('email.multi_search') }}" method="post" class="add-entry" id="email-search-form">      
+      <div class="email-nav">
+	<div class="email-search-boxes" id="email-search-container">
+	</div>
+	<div  class="form-group">
+	  <input type=button value="+" class="btn btn-block btn-lg btn-emails btn-bar" id="add-search-boxes">
+	</div>
+
+	<div  class="form-group">
+	  <input type=submit value="Search" class="btn btn-block btn-lg btn-customers submit-buttons btn-bar" id="email-search-submit">
+	</div>     
+      </div>   
+
+    </form>
+    {% endif %}
+  <article id="main">
+    <div id="container">
+      <p>
+        <a href=javascript:void(); id="saveAll">Save All</a> |
+        <a href=javascript:void(); id="clearAll">Clear All</a> |
+        <a href="javascript:void();" id="exportAll">Export All</a>
+      </p>
+      <ul id="list" class="entries">
+	{% for entry in entries %}
+	<li name="customer-li">  	  
+	  <div class="left-li">
+	    <div class="customer-firstname"><span>{{ entry.first_name }}</span></div> 
+	    <div class="customer-lastname"><span>{{ entry.last_name}} </span></div>
+	    <div class="customer-email">Email:<span>{{ entry.email|safe }}</span></div>
+	    <div class="customer-birthdate">Birthdate:<span>{{ entry.birth }}</span></div> 
+	  </div>
+	  <div class="right-li">
+	    <button class="btn btn-block btn-lg btn-danger" onclick="deleteParentListElement(this);"><span class="fui-cross"></span></button>
+	    <input type=button value="edit" class="btn btn-block btn-lg btn-customers" onclick="makeEditable(this);">
+	  </div>
+	</li>
+	  {% else %}
+	  <li><em>Unbelievable.  No entries here so far</em>
+	    {% endfor %}	    
+
+      </ul>
+
+    </div>
+  </article>
+  
+{% endblock %}
+  

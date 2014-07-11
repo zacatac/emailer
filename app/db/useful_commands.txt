@@ -1,0 +1,10 @@
+-- Selecting visits by customer
+SELECT  customers.first_name, customers.last_name, 
+ GROUP_CONCAT(visit.visit_time) AS 'time'
+FROM customers JOIN visit WHERE visit.customer_id = customers.id
+GROUP BY customers.id;
+
+-- Selecting customers with same first and last name, but different customer ids (and different birthdates (hopefully...))
+SELECT  c2.first_name as first, c2.last_name last, c1.id as c1id, c2.id as c2id
+FROM customers as c2 JOIN customers as c1 WHERE c1.id != c2.id AND c1.first_name = c2.first_name AND c1.last_name = c2.last_name
+GROUP BY c1.id;

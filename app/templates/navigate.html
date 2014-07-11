@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+    <div class="nav-container">
+      <div class="nav-page-whole"> 
+	  <a href="{{ url_for('customer.options')}}" class="btn btn-block btn-lg btn-customers btn-nav">Manage Customers</a>
+      </div>
+      <div class="nav-page-whole"> 
+	  <a href="{{ url_for('main.calendar') }}" class="btn btn-block btn-lg btn-calendar btn-nav">Create a calendar</a>
+      </div>    
+      <div class="nav-page-whole"> 
+	  <a href="{{ url_for('email.index') }}" class="btn btn-block btn-lg btn-emails btn-nav">Send emails</a>
+     </div>
+    </div>
+{% endblock %}
+
