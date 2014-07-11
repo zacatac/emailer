@@ -15,7 +15,6 @@ cache = Cache()
 # init Flask-Babel
 babel = Babel()
 
-
 # init flask assets
 assets_env = Environment()
 
