@@ -1,7 +1,7 @@
 import os
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack, jsonify, Blueprint
-from util import bulk_upload, upload
+from util import bulk_upload, upload, create_command
 from . import db
 from app import cache
 from datetime import datetime
