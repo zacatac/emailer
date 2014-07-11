@@ -3,7 +3,7 @@
 from app import create_app
 from app.models import db
 
-
+# From template
 # class TestForm:
 #     def setup(self):
 #         app = create_app('app.settings.DevConfig', env='dev')
