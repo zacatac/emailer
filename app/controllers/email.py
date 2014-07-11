@@ -2,7 +2,7 @@ from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack, jsonify, Blueprint
 from util import create_command
 from app import cache
-from database import db
+from . import db
 
 email = Blueprint('email', __name__)
 

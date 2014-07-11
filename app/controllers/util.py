@@ -1,8 +1,7 @@
 import csv,sys,imp,subprocess
 from datetime import datetime
 from werkzeug import secure_filename
-from parse_csv import CSV_to_dict as dictize
-from database import db
+from . import dictize, db
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -79,14 +78,12 @@ def bulk_upload(addr,activity):
         if activity not in ['0','1']: raise_the_roof()
         activity_dict = {'0':'laser','1':'learnToSkate'}
         activity = activity_dict[activity]       
-        db.engine.execute('BEGIN') 
         for row in reader:   # iterates the rows of the file in order
             rows += 1
             if header:
                 header = False
             else:
                 if upload(row,activity): unique += 1
-        db.engine.execute('END')
     finally:
         f.close()      # closing    
     return unique

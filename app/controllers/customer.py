@@ -1,8 +1,9 @@
+import os
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack, jsonify, Blueprint
 from util import bulk_upload, upload
+from . import db
 from app import cache
-from database import db
 from datetime import datetime
 
 customer = Blueprint('customer', __name__)
@@ -78,10 +79,10 @@ def add_player():
 
 @customer.route('/add_all', methods=['POST'])
 def add_players():
-    print('caller')
     if not session.get('logged_in'):
         redirect(url_for('login'))          
-    request.files['file'].save('users_upload.csv')    
-    unique = bulk_upload('users_upload.csv',request.form['activity'])
+    path = os.path.join('app','uploads','users_upload.csv')
+    request.files['file'].save(path)
+    unique = bulk_upload(path,request.form['activity'])
     flash('{0} uploaded!'.format(unique))
     return redirect(url_for('customer.register'))

@@ -2,6 +2,7 @@
 *.pyo
 *.swp
 *~
+*.csv
 
 # Packages
 *.egg
