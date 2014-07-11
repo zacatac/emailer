@@ -3,6 +3,7 @@
 *.swp
 *~
 *.csv
+*.#
 
 # Packages
 *.egg
