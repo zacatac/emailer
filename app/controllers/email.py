@@ -28,6 +28,6 @@ def multi_search():
 
 @email.route('/email', methods=['GET','POST'])
 def index():
-    if not session.get('logged_in'):
-        return redirect(url_for('main.login'))
+    # if not session.get('logged_in'):
+    #     return redirect(url_for('main.login'))
     return render_template("email.html")

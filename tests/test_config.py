@@ -16,3 +16,4 @@ class TestConfig:
 
         assert app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:////Users/zrfield/laserstrike/ice/app/db/ice.db'
         assert app.config['CACHE_TYPE'] == 'simple'
+        

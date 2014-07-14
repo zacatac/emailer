@@ -1,23 +1,21 @@
 import os
-from flask import Flask
+from flask import Flask, request
 from flask.ext.assets import Environment, Bundle
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 from flask.ext.cache import Cache
 from flask.ext.babel import Babel
-
-
+from flask.ext.user import current_user, login_required, UserManager, UserMixin, SQLAlchemyAdapter, roles_required
+from flask.ext.mail import Mail
+from flask.ext.login import LoginManager
 # from app import assets
 from database import db
+from models import User, IceRegisterForm
 
 # Setup flask cache
 cache = Cache()
 
-# init Flask-Babel
-babel = Babel()
-
 # init flask assets
 assets_env = Environment()
-
 
 def create_app(object_name, env="development"):
     """
@@ -42,28 +40,40 @@ def create_app(object_name, env="development"):
     #init SQLAlchemy
     db.init_app(app)
 
-    # init Babel
-    babel.init_app(app)
-
+    # Initialize Flask-Babel
+    babel = Babel(app)                              
+    
+    # Initialize Flask-Mail
+    mail = Mail(app)       
+                         
     @babel.localeselector
     def get_locale():
         translations = [str(translation) for translation in babel.list_translations()]
         return request.accept_languages.best_match(translations)
+    # Setup Flask-User
+    db_adapter = SQLAlchemyAdapter(db,  User)       # Select database adapter
+    user_manager = UserManager(db_adapter, 
+                               app,
+                               register_form = IceRegisterForm)     # Init Flask-User and bind to app
+    # @app.teardown_appcontexta
+    # def shutdown_session(exception=None):
+    #     """Closes the database again at the end of the request."""
+    #     db_session.remove()
 
-    
     # import and register the different asset bundles
     # assets_env.init_app(app)
     # assets_loader = PythonAssetsLoader(assets)
     # for name, bundle in assets_loader.load_bundles().iteritems():
     #     assets_env.register(name, bundle)
 
-    # register our blueprints
+    # register blueprints
     from controllers.main import main
     from controllers.customer import customer
     from controllers.email import email
     app.register_blueprint(main)
     app.register_blueprint(customer)
     app.register_blueprint(email)
+
     return app
 
 if __name__ == '__main__':
@@ -71,9 +81,10 @@ if __name__ == '__main__':
     # shell var APPNAME_ENV
     env = os.environ.get('APPNAME_ENV', 'prod')
     app = create_app('app.config.%sConfig' % env.capitalize(), env=env)
+    # Create 'user007' user with 'secret' and 'agent' roles
+
+
     app.run()
-
-
 
 # from flask import Flask       
 # from flask_bootstrap import Bootstrap

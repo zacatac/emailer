@@ -3,15 +3,52 @@
     Database Models
     ~~~~~~
 """
+from flask import current_app
+
 from database import db
 from datetime import datetime,date
-from flask.ext.user import current_user, login_required, UserManager, UserMixin, SQLAlchemyAdapter
+from flask.ext.user import UserMixin, login_required
+from flask.ext.user.forms import RegisterForm
+from wtforms import validators, ValidationError
 
-# class User(db.model, UserMixin):
-#     id = db.Column(db.Integer, primary_key=True)
-#     active = db.Column(db.Boolean(), nullable=False, default=False)
-#     username = db.Column(db.String(50), nullable=False, unique=True)
-#     password = db.Column(db.String(255), nullable=False, default='')
+def icesportsforum_email(form, field):
+    email = field.data
+    if "@" not in email or email.split("@")[1] != "icesportsforum.com":
+            raise ValidationError('Must have an Ice Sports Forum email to register')
+    
+
+class IceRegisterForm(RegisterForm):
+    def validate(self):       
+        if icesportsforum_email not in self.email.validators:
+            email = self.email.validators.append(icesportsforum_email)
+        return super(IceRegisterForm, self).validate()
+        
+
+# Define the User-Roles pivot table
+user_roles = db.Table('user_roles',
+                      db.Column('id', db.Integer(), primary_key=True),
+                      db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
+                      db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE')))
+
+    
+# Define User model.
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    active = db.Column(db.Boolean(), nullable=False, default=False)
+    username = db.Column(db.String(50), nullable=False, unique=True)
+    password = db.Column(db.String(255), nullable=False, default='')
+    email = db.Column(db.String(255), nullable=False, unique=True)
+    confirmed_at = db.Column(db.DateTime())
+    reset_password_token = db.Column(db.String(100), nullable=False, default='')
+    # Relationships
+    roles = db.relationship('Role', secondary=user_roles,
+                            backref=db.backref('users', lazy='dynamic'))
+    
+# Define Role model
+class Role(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
 
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -54,3 +91,4 @@ class LearnToSkate(db.Model):
     
 
     
+

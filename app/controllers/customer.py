@@ -5,23 +5,26 @@ from util import bulk_upload, upload, create_command
 from . import db
 from app import cache
 from datetime import datetime
+from flask.ext.user import current_user, login_required
 
 customer = Blueprint('customer', __name__)
 
 @customer.route('/customer/options')
 def options():
-    if not session.get('logged_in'):
-        return redirect(url_for('main.login'))
-    cur = db.engine.execute('select first_name, last_name, email, entered from customer order by id desc')
-    players = cur.fetchall()
-    players = [player for player in players if player[2] != '']
-    return render_template('show_options.html' , entries=players)
+    if current_user.is_authenticated():
+        cur = db.engine.execute('select first_name, last_name, email, entered from customer order by id desc')
+        players = cur.fetchall()
+        players = [player for player in players if player[2] != '']
+        return render_template('show_options.html' , entries=players)
+    return redirect(url_for('user.login'))
 
 @customer.route('/customer/register', methods=['GET'])
+@login_required
 def register():    
     return render_template('register.html')
 
 @customer.route('/customer/find', methods=['GET','POST'])
+@login_required
 def find():
     if request.method == 'POST':
         search_dict = {
@@ -43,9 +46,10 @@ def find():
 
 
 @customer.route('/customer/add', methods=['POST'])
+@login_required
 def add_player():
-    if not session.get('logged_in'):
-        redirect(url_for('main.login'))
+    # if not session.get('logged_in'):
+    #     redirect(url_for('main.login'))
     first_name = request.form['first_name'].strip().title()
     last_name = request.form['last_name'].strip().title()
     sex = {
@@ -78,9 +82,8 @@ def add_player():
     return redirect(url_for('customer.register'))
 
 @customer.route('/add_all', methods=['POST'])
+@login_required
 def add_players():
-    if not session.get('logged_in'):
-        redirect(url_for('login'))          
     path = os.path.join('app','uploads','users_upload.csv')
     request.files['file'].save(path)
     unique = bulk_upload(path,request.form['activity'])

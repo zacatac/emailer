@@ -19,7 +19,6 @@ class TestURLs():
         db.session.remove()
         db.drop_all()
 
-
     def test_navigate(self):
         rv = self.app.get('/')
         assert rv.status == '200 OK'

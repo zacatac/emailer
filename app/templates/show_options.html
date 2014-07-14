@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% if session.logged_in %}
+  {% if current_user.is_authenticated() %}
     <div class="nav-container">
       <div class="nav-page"> 
 	  <a href="{{ url_for('customer.register')}}" class="btn btn-block btn-lg btn-customers">Register customer(s)</a>
@@ -11,3 +11,4 @@
     </div>
   {% endif %}
 {% endblock %}
+    
