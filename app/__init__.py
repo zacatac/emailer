@@ -58,9 +58,11 @@ def create_app(object_name, env="development"):
     from controllers.main import main
     from controllers.customer import customer
     from controllers.email import email
+    from controllers.schedule import schedule
     app.register_blueprint(main)
     app.register_blueprint(customer)
     app.register_blueprint(email)
+    app.register_blueprint(schedule)
 
     return app
 

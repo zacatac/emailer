@@ -90,5 +90,7 @@ class LearnToSkate(db.Model):
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     
 
+class Schedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)    
     
-
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))

@@ -10,13 +10,9 @@ from flask.ext.user import current_user, login_required
 customer = Blueprint('customer', __name__)
 
 @customer.route('/customer/options')
-def options():
-    if current_user.is_authenticated():
-        cur = db.engine.execute('select first_name, last_name, email, entered from customer order by id desc')
-        players = cur.fetchall()
-        players = [player for player in players if player[2] != '']
-        return render_template('show_options.html' , entries=players)
-    return redirect(url_for('user.login'))
+@login_required
+def options():    
+    return render_template('show_options.html' , entries=players)
 
 @customer.route('/customer/register', methods=['GET'])
 @login_required

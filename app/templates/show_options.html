@@ -2,11 +2,11 @@
 {% block body %}
   {% if current_user.is_authenticated() %}
     <div class="nav-container">
-      <div class="nav-page"> 
-	  <a href="{{ url_for('customer.register')}}" class="btn btn-block btn-lg btn-customers">Register customer(s)</a>
+      <div class="nav-page-whole"> 
+	  <a href="{{ url_for('customer.register')}}" class="btn btn-block btn-lg btn-customers btn-nav">Register customer(s)</a>
       </div>
-      <div class="nav-page"> 
-	  <a href="{{ url_for('customer.find') }}" class="btn btn-block btn-lg btn-calendar">Find Customers</a>
+      <div class="nav-page-whole"> 
+	  <a href="{{ url_for('customer.find') }}" class="btn btn-block btn-lg btn-calendar btn-nav">Find Customers</a>
       </div>    
     </div>
   {% endif %}
