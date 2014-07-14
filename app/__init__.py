@@ -7,7 +7,6 @@ from flask.ext.babel import Babel
 from flask.ext.user import current_user, login_required, UserManager, UserMixin, SQLAlchemyAdapter, roles_required
 from flask.ext.mail import Mail
 from flask.ext.login import LoginManager
-# from app import assets
 from database import db
 from models import User, IceRegisterForm
 
@@ -55,17 +54,6 @@ def create_app(object_name, env="development"):
     user_manager = UserManager(db_adapter, 
                                app,
                                register_form = IceRegisterForm)     # Init Flask-User and bind to app
-    # @app.teardown_appcontexta
-    # def shutdown_session(exception=None):
-    #     """Closes the database again at the end of the request."""
-    #     db_session.remove()
-
-    # import and register the different asset bundles
-    # assets_env.init_app(app)
-    # assets_loader = PythonAssetsLoader(assets)
-    # for name, bundle in assets_loader.load_bundles().iteritems():
-    #     assets_env.register(name, bundle)
-
     # register blueprints
     from controllers.main import main
     from controllers.customer import customer
@@ -85,25 +73,3 @@ if __name__ == '__main__':
 
 
     app.run()
-
-# from flask import Flask       
-# from flask_bootstrap import Bootstrap
-# from models import *
-# from database import db
-# from app.config import DevelopmentConfig, ProductionConfig
-
-
-# def create_app(config):
-#     app = Flask(__name__)
-#     Bootstrap(app)
-#     app.config.update()
-#     app.config.from_object(config)
-#     app.config.from_envvar('FLASKR_SETTINGS', silent=True)   
-#     return app
-    
-# app = create_app(DevelopmentConfig)
-# db.init_app(app)
-# with app.test_request_context():
-#     db.create_all()  
-      
-# from app import views

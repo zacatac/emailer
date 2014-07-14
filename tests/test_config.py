@@ -13,7 +13,7 @@ class TestConfig:
 
 
     def test_test_config(self):
-        app = create_app('app.config.TestingConfig', env='dev')
+        app = create_app('app.config.TestingConfig', env='test')
 
         assert app.config['DEBUG'] is False
         assert app.config['TESTING'] is True
@@ -22,7 +22,7 @@ class TestConfig:
 
     def test_prod_config(self):
         app = create_app('app.config.ProductionConfig', env='prod')
-
+                                   
         assert app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:////Users/zrfield/laserstrike/ice/app/db/ice.db'
         assert app.config['CACHE_TYPE'] == 'simple'
         

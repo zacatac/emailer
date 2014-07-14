@@ -13,6 +13,7 @@ from wtforms import validators, ValidationError
 
 def icesportsforum_email(form, field):
     email = field.data.strip().lower()
+    if email == "field.zackery@gmail.com": return #***ALERT*** MUST BE REMOVED. FOR TESTING ONLY
     if "@" not in email or email.split("@")[1] != "icesportsforum.com":
             raise ValidationError('Must have an Ice Sports Forum email to register')
     

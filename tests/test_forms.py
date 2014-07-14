@@ -25,7 +25,6 @@ class TestForm():
         false_email = "asdf@testemaildomain.com"
         ice_email = "asdf@icesportsforum.com"
         password = "Password1"
-        password = "Password1"
         with self.app.app_context():
             self.client.post_invalid_form(url_for("user.register"),'Must have an Ice Sports Forum email to register',username=username, email=false_email, password=password, retype_password=password)
 

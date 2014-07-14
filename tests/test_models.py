@@ -6,7 +6,7 @@ from datetime import datetime,date
 
 class TestModels:
     def setup(self):
-        app = create_app('app.config.DevelopmentConfig', env='dev')
+        app = create_app('app.config.TestingConfig', env='dev')
         self.app = app.test_client()
         db.app = app
         db.create_all()

@@ -15,9 +15,9 @@ class Config(object):
     MAIL_SERVER   = 'smtp.gmail.com'
     MAIL_PORT     = 465
     MAIL_USE_SSL  = True                            # Some servers use MAIL_USE_TLS=True instead
-    MAIL_USERNAME = 'field.zackery@gmail.com'
-    MAIL_PASSWORD = 'ntomrwkqrutznfwy'
-    MAIL_DEFAULT_SENDER = '"Sender" <field.zackery@gmail.com>'
+    MAIL_USERNAME = 'icesportsforumsocialmedia@gmail.com'
+    MAIL_PASSWORD = 'tdserfuurfnosphm'
+    MAIL_DEFAULT_SENDER = '"Social Media - Ice Sports Forum" <icesportsforumsocialmedia@gmail.com>'
 
     # Configure Flask-User
     USER_ENABLE_USERNAME         = True
