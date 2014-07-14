@@ -12,7 +12,7 @@ from flask.ext.user.forms import RegisterForm
 from wtforms import validators, ValidationError
 
 def icesportsforum_email(form, field):
-    email = field.data
+    email = field.data.strip().lower()
     if "@" not in email or email.split("@")[1] != "icesportsforum.com":
             raise ValidationError('Must have an Ice Sports Forum email to register')
     
@@ -30,7 +30,6 @@ user_roles = db.Table('user_roles',
                       db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
                       db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE')))
 
-    
 # Define User model.
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)

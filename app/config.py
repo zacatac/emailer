@@ -40,14 +40,15 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     SECRET_KEY = 'testing key'
-    DATABASE = '/db/test.db'
+    DATABASE = 'test.db'
     DATABASE_DIRECTORY = 'db'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE)    
     TESTING = True
+    SERVER_NAME='localhost'  # Enable url_for() without request context
 
 class ProductionConfig(Config):
     SECRET_KEY = 'testing key'
     CACHE_TYPE = 'simple'
-    DATABASE = '/db/ice.db'
+    DATABASE = 'ice.db'
     DATABASE_DIRECTORY = 'db'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE) 

@@ -1,8 +1,7 @@
 #! ../env/bin/python
 # -*- coding: utf-8 -*-
 from app import create_app
-from app.database import db
-from app.models import Customer
+from . import db, Customer
 from datetime import datetime,date
 
 class TestModels:
