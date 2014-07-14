@@ -9,7 +9,7 @@ from . import db
 
 class TestURLs():
     def setup(self):
-        app = create_app('app.config.DevelopmentConfig', env='dev')
+        app = create_app('app.config.TestingConfig', env='dev')
         self.config = app.config
         self.app = app.test_client()
         db.app = app
@@ -19,7 +19,6 @@ class TestURLs():
         db.session.remove()
         db.drop_all()
 
-
     def test_navigate(self):
         rv = self.app.get('/')
         assert rv.status == '200 OK'
@@ -28,6 +27,7 @@ class TestURLs():
         assert 'Send emails' in rv.data
 
     def test_login(self):
-        rv = self.app.get('/login')
-        assert 'Username' in rv.data
-        assert 'Password' in rv.data
+        rv = self.app.get('/user/register')
+        assert 'Sign in' in rv.data
+        assert 'Register' in rv.data
+        assert 'Forgot your Password?' in rv.data

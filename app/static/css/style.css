@@ -211,6 +211,12 @@ element.style {
     background-color: #8aaece;
     border-color: #357ebd;
 }
+
+.btn-schedule{
+    color: #fff;
+    background-color: #9cb6ce;
+    border-color: #357ebd;
+}
 .btn-danger {
     color: #ffffff;
     background-color: #e74c3c;
