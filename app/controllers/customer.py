@@ -12,7 +12,7 @@ customer = Blueprint('customer', __name__)
 @customer.route('/customer/options')
 @login_required
 def options():    
-    return render_template('show_options.html' , entries=players)
+    return render_template('show_options.html')
 
 @customer.route('/customer/register', methods=['GET'])
 @login_required
