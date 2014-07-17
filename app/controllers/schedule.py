@@ -1,9 +1,13 @@
 import os
-from flask import request, session, g, redirect, url_for, abort, \
-     render_template, flash, _app_ctx_stack, jsonify, Blueprint
 from . import db
 from datetime import datetime
-from flask.ext.user import login_required
+from flask import request, session, g, redirect, url_for, abort, \
+     render_template, flash, _app_ctx_stack, jsonify, Blueprint
+from ..flask_user import login_required, roles_required, current_user
+from app import cache
+from . import db
+from ..models import User, Schedule
+
 
 # import gflags
 # import httplib2
@@ -14,6 +18,45 @@ from flask.ext.user import login_required
 # from oauth2client.tools import run
 
 # FLAGS = gflags.FLAGS
+schedule = Blueprint('schedule', __name__)
+
+@schedule.route('/schedule/manage', methods=['GET','POST'])
+# @roles_required('management')
+def hours():
+    if request.method == "POST":
+        hours = {}
+        for item in request.form:
+            hours[item] = request.form[item]
+        print(hours)
+        user = User.query.filter_by(id=current_user.id).first()
+        print(user.username, user.email)
+        if user is None:
+            raise ValueError("NOOOOOOOO")
+        available = []
+        for i in range(7):
+            data = (hours['start%s' % i], hours['end%s' % i])
+            available.append(data)        
+        print(available)
+        sch = Schedule.query.filter_by(user_id=user.id).first()
+        if sch is None:
+            
+            sch = Schedule(user_id=user.id,available=available)
+            db.session.add(sch)
+        else:
+            print('not handled properly')
+            sch.available=available
+        db.session.commit()
+        
+        flash('Hours Uploaded!')
+        sch = Schedule.query.filter_by(user_id=user.id).first()
+        print(sch.available)
+        return render_template('hours.html')                
+    return render_template('hours.html')
+
+@schedule.route('/schedule/register', methods=['GET','POST'])
+@roles_required('management')
+def register_employee():
+    return render_template('employee_login_or_register.html')
 
 # # Set up a Flow object to be used if we need to authenticate. This
 # # sample uses OAuth 2.0, and we set up the OAuth2WebServerFlow with
@@ -48,10 +91,3 @@ from flask.ext.user import login_required
 # # to get a developerKey for your own application.
 # service = build(serviceName='calendar', version='v3', http=http,
 #        developerKey='YOUR_DEVELOPER_KEY')
-
-
-schedule = Blueprint('schedule', __name__)
-
-@schedule.route('/schedule/#', methods=['GET'])
-def hours():
-    return render_template('hours.html')

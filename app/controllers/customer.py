@@ -5,22 +5,22 @@ from util import bulk_upload, upload, create_command
 from . import db
 from app import cache
 from datetime import datetime
-from flask.ext.user import current_user, login_required
+from ..flask_user import current_user, login_required, roles_required
 
 customer = Blueprint('customer', __name__)
 
 @customer.route('/customer/options')
-@login_required
+@roles_required('management')
 def options():    
-    return render_template('show_options.html' , entries=players)
+    return render_template('show_options.html')
 
 @customer.route('/customer/register', methods=['GET'])
-@login_required
+@roles_required('management')
 def register():    
     return render_template('register.html')
 
 @customer.route('/customer/find', methods=['GET','POST'])
-@login_required
+@roles_required('management')
 def find():
     if request.method == 'POST':
         search_dict = {
@@ -42,7 +42,7 @@ def find():
 
 
 @customer.route('/customer/add', methods=['POST'])
-@login_required
+@roles_required('management')
 def add_player():
     # if not session.get('logged_in'):
     #     redirect(url_for('main.login'))
@@ -78,7 +78,7 @@ def add_player():
     return redirect(url_for('customer.register'))
 
 @customer.route('/add_all', methods=['POST'])
-@login_required
+@roles_required('management')
 def add_players():
     path = os.path.join('app','uploads','users_upload.csv')
     request.files['file'].save(path)

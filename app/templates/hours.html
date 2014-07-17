@@ -1,117 +1,23 @@
 {% extends "layout.html" %}
 {% block body %}
 <body>
-  <script src="/static/js/calendar.js"></script>    
-  <form name="myform" id="cal-create-form" class="cal-form">
-    <div class="form-group">
-      Start:  
-      <label for="sat">
-	<input type="radio" name="day" id="sat" value="6"> Saturday
-      </label> 
-      <label for="sun">
-	<input type="radio" name="day" id="sun" value="0" checked=""> Sunday
-      </label> 
-      <label for="mon">
-	<input type="radio" name="day" id="mon" value="1"> Monday
-      </label>
-    </div>
-    <br>
-    <div class="form-group">
-      Month: 
-      <select name="month">
-	<option value="0">January</option>
-	<option value="1">February</option>
-	<option value="2">March</option>
-	<option value="3">April</option>
-	<option value="4">May</option>
-	<option value="5">June</option>
-	<option value="6">July</option>
-	<option value="7">August</option>
-	<option value="8">September</option>
-	<option value="9">October</option>
-	<option value="10">November</option>
-	<option value="11">December</option>
-      </select> 
-     
-      Year:
-      <input type="text" name="year" size="4" maxlength="4"  >&nbsp;<br>
-    </div>
+  <script src="/static/js/hours.js"></script> 
+  <form action="{{ url_for('schedule.hours') }}" name="myform" method="post" id="cal-create-form" class="cal-form">
     <div name="hours" id="hours">
       <!--  FILLED IN! -->
     </div>
-    <input type="button"  value="Create Calendar" class="submit-buttons" id="calendar-submit"><br>    
-    <br>
-    <br>
-  <div id="sample">
-    <table id="month" class="flat-table flat-table-1">
-    <thead>
-    <tr>
-    <th class="weekend">&nbsp;Sunday&nbsp;&nbsp;</th>
-    <th>&nbsp;Monday&nbsp;&nbsp;</th>
-    <th>&nbsp;Tuesday&nbsp;</th>
-    <th style="">Wednesday</th>
-    <th>Thursday&nbsp;</th>
-    <th>&nbsp;Friday&nbsp;&nbsp;</th>
-    <th class="weekend">Saturday&nbsp;</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-    <td class="previous weekend"><span class="date">28</span><div class="day"></div></td>
-    <td class="previous"><span class="date" >29</span><div class="day"></div></td>
-    <td class="previous"><span class="date">30</span><div class="day"></div></td>
-    <td class="previous"><span class="date">31</span><div class="day"></div></td>
-    <td><span class="date">1</span><div class="day"></div></td>
-    <td><span class="date">2</span><div class="day"></div></td>
-    <td class="weekend"><span class="date">3</span><div class="day"></div></td>
-    </tr><tr>
-    <td class="weekend"><span class="date">4</span><div class="day"></div></td>
-    <td><span class="date">5</span><div class="day"></div></td>
-    <td><span class="date">6</span><div class="day"></div></td>
-    <td><span class="date">7</span><div class="day"></div></td>
-    <td><span class="date">8</span><div class="day"></div></td>
-    <td><span class="date">9</span><div class="day"></div></td>
-    <td class="weekend"><span class="date">10</span><div class="day"></div></td>
-    </tr><tr>
-    <td class="weekend"><span class="date">11</span><div class="day"></div></td>
-    <td><span class="date">12</span><div class="day"></div></td>
-    <td><span class="date">13</span><div class="day"></div></td>
-    <td><span class="date">14</span><div class="day"></div></td>
-    <td><span class="date">15</span><div class="day"></div></td>
-    <td><span class="date">16</span><div class="day"></div></td>
-    <td class="weekend"><span class="date">17</span><div class="day"></div></td>
-    </tr><tr>
-    <td class="weekend"><span class="date">18</span><div class="day"></div></td>
-    <td><span class="date">19</span><div class="day"></div></td>
-    <td><span class="date">20</span><div class="day"></div></td>
-    <td><span class="date">21</span><div class="day"></div></td>
-    <td><span class="date">22</span><div class="day"></div></td>
-    <td><span class="date">23</span><div class="day"></div></td>
-    <td class="weekend"><span class="date">24</span><div class="day"></div></td>
-    </tr><tr>
-    <td class="weekend"><span class="date">25</span><div class="day"></div></td>
-    <td><span class="date">26</span><div class="day"></div></td>
-    <td><span class="date">27</span><div class="day"></div></td>
-    <td><span class="date">28</span><div class="day"></div></td>
-    <td><span class="date">29</span><div class="day"></div></td>
-    <td><span class="date">30</span><div class="day"></div></td>
-    <td class="weekend"><span class="date">31</span><div class="day"></div></td>
-    </tr>
-    </tbody>
-    </table>
-  </div>
-      <p>
-        <a href=javascript:void(); id="saveAll">Save All</a> |
-        <a href=javascript:void(); id="clearAll">Clear All</a>
-      </p>
-    <div class="tiptext">
-      <textarea name="html" cols="40" rows="10" form="cal-create-form" id="calendar-html"></textarea>
-      <div class="description"> This area contains the text that describes the calendar below. 
-      In order to get this calendar onto the site, simply press the "Extract HTML" button and send the text
-	in the box to the website administrator.</div>
+    <div  class="form-group">
+      <button class="btn btn-block btn-lg btn-customers submit-buttons btn-bar" id="hours-submit">Set Schedule</button>
     </div>
+    <br>
+    <div  class="form-group">
+      <a class="btn btn-block btn-lg btn-customers submit-buttons btn-bar" id="schedule-register" href="{{ url_for('user.register') }}">Register Employee</a>
+    </div>   
 
-    <input type="button" value="Extract HTML" form="cal-create-form" id="extract-html">      
+  </form>
+    
+    <div id="sample">
+    </div>
 </body>
 {% endblock %}
 

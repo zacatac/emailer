@@ -7,14 +7,15 @@ from flask import current_app
 
 from database import db
 from datetime import datetime,date
-from flask.ext.user import UserMixin, login_required
-from flask.ext.user.forms import RegisterForm
+from flask.ext.user import UserMixin, login_required, current_user
+from flask_user.forms import RegisterForm
 from wtforms import validators, ValidationError
 
 def icesportsforum_email(form, field):
-    email = field.data.strip().lower()
-    if email == "field.zackery@gmail.com": return #***ALERT*** MUST BE REMOVED. FOR TESTING ONLY
-    if "@" not in email or email.split("@")[1] != "icesportsforum.com":
+    if not current_user.is_authenticated() or not current_user.has_roles('management'):
+        email = field.data.strip().lower()
+        if email == "field.zackery@gmail.com": return #***ALERT*** MUST BE REMOVED. FOR TESTING ONLY
+        if "@" not in email or email.split("@")[1] != "icesportsforum.com":
             raise ValidationError('Must have an Ice Sports Forum email to register')
     
 
@@ -40,6 +41,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), nullable=False, unique=True)
     confirmed_at = db.Column(db.DateTime())
     reset_password_token = db.Column(db.String(100), nullable=False, default='')
+    level = db.Column(db.Integer, default=0)
     # Relationships
     roles = db.relationship('Role', secondary=user_roles,
                             backref=db.backref('users', lazy='dynamic'))
@@ -92,5 +94,5 @@ class LearnToSkate(db.Model):
 
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
-    
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
+    available = db.Column(db.PickleType)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
