@@ -219,7 +219,7 @@ function addSearchRow(){
 }
 
 function exportData(list){
-    exportList = "First Name, Last Name, Email, Birthdate \n"
+    exportList = "First Name, Last Name, Email, Codename, Birthdate \n"
     list.children($('li')).each(
 	function (index) {
 	    $(this).children('.left-li').children('[class^=customer]').each(
