@@ -23,18 +23,23 @@
   </div>
   <div class=metanav>
     <div class='left'>
+      <a href="{{ url_for('main.navigate') }}">Home</a>
+      {% if current_user.is_authenticated() %}
+
       <a href="{{ url_for('customer.options') }}">Customers</a>
       
       <a href="{{ url_for('main.calendar') }}">Calendar</a>
       
       <a href="{{ url_for('email.index') }}">Email</a>
+      {% endif %}
     </div>
   <div class='right'>
-    <a href="{{ url_for('main.navigate') }}">Home</a>
-    {% if not session.logged_in %}
-    <a href="{{ url_for('main.login') }}">Login</a>
+
+    {% if not current_user.is_authenticated() %}
+    <a href="{{ url_for('user.login') }}">Login</a>
     {% else %}
-    <a href="{{ url_for('main.logout') }}">Logout</a>
+    <a href="{{ url_for('user.change_username') }}">{{ current_user.username}}</a>
+    <a href="{{ url_for('user.logout') }}">Logout</a>
     {% endif %}
   </div>
   </div>

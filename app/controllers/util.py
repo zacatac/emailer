@@ -1,71 +1,93 @@
 import csv,sys,imp,subprocess
 from datetime import datetime
 from werkzeug import secure_filename
-from . import dictize, db
+from sqlalchemy import or_, and_
+from sqlalchemy.exc import IntegrityError
+from . import dictize, db, Customer, Visit, Laser
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-def raise_the_roof():
-    raise IntegrityError('Skating and hockey tables not yet supported')   
-
 def db_contains(first_name,last_name,email,birth,verbose=False):
-    if email == "":
-        already = db.engine.execute('SELECT * FROM customer WHERE (first_name=:first_name AND last_name=:last_name AND birth=:birth)',
-                             {"first_name":first_name, "last_name":last_name, "birth":birth}).fetchone()
-    else: 
-        already = db.engine.execute('SELECT * FROM customer WHERE (first_name=:first_name AND last_name=:last_name AND birth=:birth) OR (email=:email AND first_name=:first_name AND last_name=:last_name)',
-                             {"first_name":first_name, "last_name":last_name,"email":email,"birth":birth}).fetchone()
+    name_condition = [Customer.first_name==first_name,
+                      Customer.last_name==last_name]
+    name_and_birth = name_condition + [Customer.birth==birth]
+    name_and_email = name_condition + [Customer.email==email]
+    name_and_birth_and = and_(*name_and_birth)
+    name_and_email_and = and_(*name_and_email)
     
+    if email == "":
+        already = Customer.query.filter(name_and_email_and)
+
+    else: 
+        already = Customer.query.filter(or_(*[name_and_birth_and, name_and_email_and]))
+        
+    already = already.first()
     if already is not None:
-        if verbose:
-            already_entered = 'Person already entered into the database'
-            print(already_entered + \
-                  '\nName:{0} {1}\
-                  \nEntered:{2}'\
-                  .format(already['first_name'],
-                          already['last_name'],
-                          already['entered']))
-        return (True, already['id'])
+        return (True, already.id)
     return (False,None)
 
 def upload(customer,activity):
     first_name = customer[0].strip().title()
     last_name = customer[1].strip().title()
-    sex = customer[2].strip().title()
+    sex = {'M':0,'F':1,'':2,'N':3}[customer[2].strip().title()]
     email = customer[4].strip().lower()   
+    if email == "": email = None
     birth = customer[3].strip()
     visit_time = customer[5].strip()
+    if birth in ["0000-00-00", ""]:
+        birth = None;
     contains,id = db_contains(first_name, last_name, email,birth)
     if not contains:
+        customer_row= Customer(first_name=first_name,
+                            last_name=last_name,
+                            email=email,
+                            birth=birth,
+                            sex=sex,
+                            entered=str(datetime.now()))
         try:
-            db.engine.execute('insert into customer (first_name, last_name, email, birth, sex, entered) values (?, ?, ?, ?, ?, ?)',[first_name, last_name, email, birth, sex ,str(datetime.now())])
-            # db.commit()              
+            db.session.add(customer_row)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            print("exception",customer_row.first_name,customer_row.last_name,customer_row.email)
+            email = None
+            customer_row=Customer(first_name=first_name,
+                            last_name=last_name,
+                            email=email,
+                            birth=birth,
+                            sex=sex,
+                            entered=str(datetime.now()))
+
+            db.session.add(customer_row)
+            db.session.commit()
+        finally:
+            id = Customer.query.filter_by(first_name=first_name,
+                                 last_name=last_name,
+                                 email=email,
+                                 birth=birth,
+                                 sex=sex).first().id
             if activity == 'laser':
                 codename = customer[6].strip().upper()
-                field = 'codename'
-                insert = codename
+                player_aux = Laser(codename=codename,customer_id=id)
             elif activity == 'learnToSkate':
                 field = 'skill'
-                insert = '1' #***ALERT***
-            else:
-                raise_the_roof()
-            id = db.engine.execute('SELECT id FROM customer WHERE first_name=:first_name AND last_name=:last_name AND email=:email AND birth=:birth',{"first_name":first_name,"last_name":last_name,"email":email,"birth":birth}).fetchone()['id']
-            command = 'INSERT INTO {0} ({1},customer_id) values (?,?)'.format(activity,field)
-            db.engine.execute(command,[insert,id])
-            command = 'INSERT INTO visit (visit_time,customer_id) values (?,?)'
-            db.engine.execute(command,[visit_time,id])
-            # db.commit()
+                insert = '1' #***ALERT*** 
+                player_aux = Laser(skill=1,customer_id=id)
+            visit = Visit(visit_time=visit_time, customer_id=id)
+            db.session.add(player_aux)            
+            db.session.add(visit)
+            db.session.commit()
             return True
-        except IntegrityError:                        
-                flash('Name fields, and email cannot be empty')
-    else:                    
-        command = 'INSERT INTO visit (visit_time,customer_id) values (?,?)'
-        contains = True if db.engine.execute('SELECT visit.id FROM visit WHERE visit_time=:visit_time AND customer_id=:id',{"visit_time":visit_time,"id":id}).fetchone() is not None else False
-        if not contains: # replace with contains after test
-            db.engine.execute(command,[visit_time,id])
-            # db.commit()
+
+            
+    else:     
+        query = Visit.query.filter(Visit.visit_time==visit_time, Visit.customer_id==id)
+        if query.first() is not None:
+            visit = Visit(visit_time=visit_time, customer_id=id)
+            db.session.add(visit)
+            db.session.commit()
     return False
                         
 def bulk_upload(addr,activity):
@@ -75,7 +97,6 @@ def bulk_upload(addr,activity):
         header = True
         rows = 0
         unique = 0
-        if activity not in ['0','1']: raise_the_roof()
         activity_dict = {'0':'laser','1':'learnToSkate'}
         activity = activity_dict[activity]       
         for row in reader:   # iterates the rows of the file in order
@@ -91,15 +112,15 @@ def bulk_upload(addr,activity):
 def create_command(queries):
 
     form_where_clause = lambda column, relation, criteria: {
-        "0":"({0} LIKE \"%{1}%\")".format(column, criteria),
-        "1":"({0} NOT LIKE \"%{1}%\")".format(column, criteria),
-        "2":"({0} BETWEEN \"0\" AND \"{1}\")".format(column, criteria),
-        "3":"({0} BETWEEN \"{1}\" AND \"9999\")".format(column, criteria),
-        "4":"({0} LIKE \"{1}%\")".format(column, criteria),
-        "5":"({0} LIKE \"%{1}\")".format(column, criteria),
-        "6":"({0} IS \"{1}\")".format(column, criteria),
-        "7":"({0} IS NOT \"{1}\")".format(column, criteria),
-        "8":"(strftime('%m', {0}) IS \"{1}\")".format(column,"{0}".format(criteria).zfill(2)) 
+        "0":"({0} LIKE \'%%{1}%%\')".format(column, criteria),
+        "1":"({0} NOT LIKE \'%%{1}%%\')".format(column, criteria),
+        "2":"({0} BETWEEN \'0\' AND \'{1}\')".format(column, criteria),
+        "3":"({0} BETWEEN \'{1}\' AND \'9999\')".format(column, criteria),
+        "4":"({0} LIKE \'{1}%%\')".format(column, criteria),
+        "5":"({0} LIKE \'%%{1}\')".format(column, criteria),
+        "6":"({0} = \'{1}\')".format(column, criteria),
+        "7":"({0} IS NOT \'{1}\')".format(column, criteria),
+        "8":"(date_part('month', {0}) = \'{1}\')".format(column,"{0}".format(criteria).zfill(2)) 
     }[relation]
 
     search_tables = {
@@ -115,7 +136,6 @@ def create_command(queries):
     visit = 'visit'
     learnToSkate = 'learnToSkate'
     customers = "customer"
-    print(queries)
     for query,values in queries.iteritems():
         selector = selectors[int(values[0])]
         relation = values[1]

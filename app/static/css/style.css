@@ -114,6 +114,9 @@ h2              { font-size: 1.2em; }
     width: 50%;
 }
 
+.time-table {
+    
+}
 .nav-page{
     width:200px;
     margin: 0 auto;
@@ -194,21 +197,43 @@ element.style {
     line-height: 1.33;
     border-radius: 6px;
 }
-.btn-customers {
+.btn-customers, .btn-hours {
     color: #fff;
     background-color: #428bca;
     border-color: #357ebd;
 }
 
+.btn-hours {
+    background-color: #1abc9c;
+}
+
+.form-hours-button {
+    width: 100%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.schedule-block{
+    display:inline-block;
+    margin-right: 20px;
+}
+
 .btn-calendar{
     color: #fff;
-    background-color: #7ba6cc;
+    background-color: #8aaece;
     border-color: #357ebd;
 }
 
 .btn-emails{
     color: #fff;
-    background-color: #8aaece;
+    background-color: #7ba6cc;
+    border-color: #357ebd;
+}
+
+.btn-schedule{
+    color: #fff;
+    background-color: #9cb6ce;
     border-color: #357ebd;
 }
 .btn-danger {

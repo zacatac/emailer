@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% if session.logged_in %}
 <div class="nav-page-title">
   <h3>Find customers</h3>
 </div>
@@ -50,9 +49,6 @@
 	  {% endfor %}	    
       </ul>
     </div>
-      {% else %}
-      <li><em><a href="{{url_for('main.login')}}">You must be logged in to search</a></em>
 
   
-  {% endif %}
 {% endblock %}

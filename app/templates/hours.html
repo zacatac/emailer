@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+<body>
+  <script src="/static/js/hours.js"></script> 
+  <form action="{{ url_for('schedule.hours') }}" name="myform" method="post" id="cal-create-form" class="cal-form">
+    <div name="hours" id="hours">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group">
+      <button class="btn btn-block btn-lg btn-customers submit-buttons btn-bar" id="hours-submit">Set Schedule</button>
+    </div>
+    <br>
+  </form>
+    
+    <div id="sample">
+    </div>
+</body>
+{% endblock %}
+

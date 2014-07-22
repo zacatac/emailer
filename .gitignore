@@ -4,6 +4,7 @@
 *~
 *.csv
 *.#
+*.db
 
 # Packages
 *.egg

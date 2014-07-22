@@ -1,52 +1,32 @@
 #! ../env/bin/python
 # -*- coding: utf-8 -*-
-from app import create_app
-from app.models import db
+from . import url_for, current_app, db, create_app, TstClient
 
+class TestForm():
+    def setup(self):
+        app = create_app('app.config.TestingConfig', env='dev')
+        self.app = app
+        db.app = app
+        db.create_all()        
+        self.client = TstClient(app.test_client(),db)
+        
 
-# class TestForm:
-#     def setup(self):
-#         app = create_app('app.settings.DevConfig', env='dev')
-#         self.app = app.test_client()
-#         db.app = app
-#         db.create_all()
+    def teardown(self):
+        db.session.remove()
+        db.drop_all()
 
-#     def teardown(self):
-#         db.session.remove()
-#         db.drop_all()
+    def test_register_form(self):
+        """
+        See Flask-User for basic tests
+        Only tests inlucded here are specific
+        to ice sports forum registration
+        """
+        username = "Jeffries"
+        false_email = "asdf@testemaildomain.com"
+        ice_email = "asdf@icesportsforum.com"
+        password = "Password1"
+        with self.app.app_context():
+            self.client.post_invalid_form(url_for("user.register"),'Must have an Ice Sports Forum email to register',username=username, email=false_email, password=password, retype_password=password)
 
-#     def test_user_form_empty(self):
-#         rv = self.app.post('/wtform', data=dict(
-#             user_name="",
-#             message=""
-#         ), follow_redirects=True)
+            self.client.post_valid_form(url_for("user.register"),username=username, email=ice_email, password=password, retype_password=password)
 
-#         assert rv.status_code == 200
-#         assert 'There was a problem submitting the form!' in rv.data
-
-#     def test_user_form_message(self):
-#         rv = self.app.post('/wtform', data=dict(
-#             user_name="",
-#             message="test message"
-#         ), follow_redirects=True)
-
-#         assert rv.status_code == 200
-#         assert 'There was a problem submitting the form!' in rv.data
-
-#     def test_user_form_name(self):
-#         rv = self.app.post('/wtform', data=dict(
-#             user_name="admin",
-#             message=""
-#         ), follow_redirects=True)
-
-#         assert rv.status_code == 200
-#         assert 'The form was successfully submitted' in rv.data
-
-#     def test_user_form_both(self):
-#         rv = self.app.post('/wtform', data=dict(
-#             user_name="admin",
-#             message="test message"
-#         ), follow_redirects=True)
-
-#         assert rv.status_code == 200
-#         assert 'The form was successfully submitted' in rv.data

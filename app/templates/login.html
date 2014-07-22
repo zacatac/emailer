@@ -3,10 +3,13 @@
   <h2>Login</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
   <form action="{{ url_for('main.login') }}" method=post>
-    <ul class=login>
-      <li>Username: <input type=text name=username></li>
-      <li>Password: <input type=password name=password></li>
-      <li> <input type=submit value=Login>
-    </ul>
+    <p> <a href="{{ url_for('user.login') }}">{%trans%}Sign in{%endtrans%}</a> or
+      <a href="{{ url_for('user.register') }}">{%trans%}Register{%endtrans%}</a></p>
+    
+    <!-- <ul class=login>
+    <li>Username: <input type=text name=username></li>
+    <li>Password: <input type=password name=password></li>
+    <li> <input type=submit value=Login>
+    </ul> -->
   </form>
 {% endblock %}

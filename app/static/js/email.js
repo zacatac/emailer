@@ -250,7 +250,8 @@ $(document).ready(function() {
 	localStorage.setItem('customerList', list.innerHTML);
 	alertify.success("You have saved your list.");
     });
-    /* $('#email-base').change(handleBase);
+    /* $('#ema
+il-base').change(handleBase);
        /* REMOVE LATER ***ALERT*** */
     /* $('#email-base option[value=\"6\"]').prop('disabled',true); */
     /****************************/     
