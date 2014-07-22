@@ -11,6 +11,10 @@ from app.database import db
 
 env = os.environ.get('APPNAME_ENV', 'development')
 app = create_app('app.config.%sConfig' % env.capitalize(), env=env)
+
+# prod_env = os.environ.get('APPNAME_ENV', 'production')
+# prod_app = create_app('app.config.%sConfig' % env.capitalize(), env=prod_env)
+
 user_manager = app.user_manager
 
 manager = Manager(app)
