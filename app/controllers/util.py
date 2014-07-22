@@ -2,6 +2,7 @@ import csv,sys,imp,subprocess
 from datetime import datetime
 from werkzeug import secure_filename
 from sqlalchemy import or_, and_
+from sqlalchemy.exc import IntegrityError
 from . import dictize, db, Customer, Visit, Laser
 
 def allowed_file(filename):
@@ -24,23 +25,19 @@ def db_contains(first_name,last_name,email,birth,verbose=False):
         
     already = already.first()
     if already is not None:
-        # already_entered = 'Person already entered into the database'
-        # print(already_entered + \
-        #       '\nName:{0} {1}\
-        #       \nEntered:{2}'\
-        #       .format(already['first_name'],
-        #               already['last_name'],
-        #               already['entered']))
         return (True, already.id)
     return (False,None)
 
 def upload(customer,activity):
     first_name = customer[0].strip().title()
     last_name = customer[1].strip().title()
-    sex = {'M':0,'F':1,'O':2}[customer[2].strip().title()]
+    sex = {'M':0,'F':1,'':2,'N':3}[customer[2].strip().title()]
     email = customer[4].strip().lower()   
+    if email == "": email = None
     birth = customer[3].strip()
     visit_time = customer[5].strip()
+    if birth in ["0000-00-00", ""]:
+        birth = None;
     contains,id = db_contains(first_name, last_name, email,birth)
     if not contains:
         customer_row= Customer(first_name=first_name,
@@ -49,25 +46,42 @@ def upload(customer,activity):
                             birth=birth,
                             sex=sex,
                             entered=str(datetime.now()))
-        db.session.add(customer_row)
-        db.session.commit()
-        id = Customer.query.filter_by(first_name=first_name,
-                             last_name=last_name,
-                             email=email,
-                             birth=birth,
-                             sex=sex).first().id
-        if activity == 'laser':
-            codename = first_name
-            player_aux = Laser(codename=codename,customer_id=id)
-        elif activity == 'learnToSkate':
-            field = 'skill'
-            insert = '1' #***ALERT*** 
-            player_aux = Laser(skill=1,customer_id=id)
-        visit = Visit(visit_time=visit_time, customer_id=id)
-        db.session.add(player_aux)            
-        db.session.add(visit)
-        db.session.commit()
-        return True
+        try:
+            db.session.add(customer_row)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            print("exception",customer_row.first_name,customer_row.last_name,customer_row.email)
+            email = None
+            customer_row=Customer(first_name=first_name,
+                            last_name=last_name,
+                            email=email,
+                            birth=birth,
+                            sex=sex,
+                            entered=str(datetime.now()))
+
+            db.session.add(customer_row)
+            db.session.commit()
+        finally:
+            id = Customer.query.filter_by(first_name=first_name,
+                                 last_name=last_name,
+                                 email=email,
+                                 birth=birth,
+                                 sex=sex).first().id
+            if activity == 'laser':
+                codename = customer[6].strip().upper()
+                player_aux = Laser(codename=codename,customer_id=id)
+            elif activity == 'learnToSkate':
+                field = 'skill'
+                insert = '1' #***ALERT*** 
+                player_aux = Laser(skill=1,customer_id=id)
+            visit = Visit(visit_time=visit_time, customer_id=id)
+            db.session.add(player_aux)            
+            db.session.add(visit)
+            db.session.commit()
+            return True
+
+            
     else:     
         query = Visit.query.filter(Visit.visit_time==visit_time, Visit.customer_id==id)
         if query.first() is not None:
@@ -98,15 +112,15 @@ def bulk_upload(addr,activity):
 def create_command(queries):
 
     form_where_clause = lambda column, relation, criteria: {
-        "0":"({0} LIKE \"%{1}%\")".format(column, criteria),
-        "1":"({0} NOT LIKE \"%{1}%\")".format(column, criteria),
-        "2":"({0} BETWEEN \"0\" AND \"{1}\")".format(column, criteria),
-        "3":"({0} BETWEEN \"{1}\" AND \"9999\")".format(column, criteria),
-        "4":"({0} LIKE \"{1}%\")".format(column, criteria),
-        "5":"({0} LIKE \"%{1}\")".format(column, criteria),
-        "6":"({0} IS \"{1}\")".format(column, criteria),
-        "7":"({0} IS NOT \"{1}\")".format(column, criteria),
-        "8":"(strftime('%m', {0}) IS \"{1}\")".format(column,"{0}".format(criteria).zfill(2)) 
+        "0":"({0} LIKE \'%%{1}%%\')".format(column, criteria),
+        "1":"({0} NOT LIKE \'%%{1}%%\')".format(column, criteria),
+        "2":"({0} BETWEEN \'0\' AND \'{1}\')".format(column, criteria),
+        "3":"({0} BETWEEN \'{1}\' AND \'9999\')".format(column, criteria),
+        "4":"({0} LIKE \'{1}%%\')".format(column, criteria),
+        "5":"({0} LIKE \'%%{1}\')".format(column, criteria),
+        "6":"({0} = \'{1}\')".format(column, criteria),
+        "7":"({0} IS NOT \'{1}\')".format(column, criteria),
+        "8":"(date_part('month', {0}) = \'{1}\')".format(column,"{0}".format(criteria).zfill(2)) 
     }[relation]
 
     search_tables = {

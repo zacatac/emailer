@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import os
-
+import os,sys
+from getopt import getopt
 from flask.ext.script import Manager, Server
 from flask.ext.migrate import MigrateCommand
 from app import create_app
@@ -8,8 +8,7 @@ from app.models import Customer, Users, Role
 from app.database import db
 
 
-
-env = os.environ.get('APPNAME_ENV', 'production')
+env = os.environ.get('APPNAME_ENV', 'development')
 app = create_app('app.config.%sConfig' % env.capitalize(), env=env)
 user_manager = app.user_manager
 

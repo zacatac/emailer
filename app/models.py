@@ -56,9 +56,9 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    birth = db.Column(db.DateTime)
+    birth = db.Column(db.Date)
     sex = db.Column(db.Integer)
-    email = db.Column(db.String)
+    email = db.Column(db.String, unique=True, nullable=True)
     phone = db.Column(db.Integer)
     entered = db.Column(db.DateTime, nullable=False)
 
