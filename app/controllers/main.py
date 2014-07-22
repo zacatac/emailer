@@ -12,6 +12,7 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @cache.cached(timeout=1000)
 def navigate():
+    print("****CURRENTUSER:%s***" % current_user)
     return render_template('navigate.html')
 
 @main.route('/calendar')

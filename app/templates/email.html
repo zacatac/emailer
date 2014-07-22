@@ -34,9 +34,13 @@
 	  <div class="left-li">
 	    <div class="customer-firstname"><span>{{ entry.first_name }}</span></div> 
 	    <div class="customer-lastname"><span>{{ entry.last_name}} </span></div>
-	    <div class="customer-email">Email:<span>{{ entry.email|safe }}</span></div>
-	    <div class="customer-codename">Codename:<span>{{ entry.codename|safe }}</span></div>
-	    <div class="customer-birthdate">Birthdate:<span>{{ entry.birth }}</span></div> 
+	    {% if entry.codename %}
+	    <div class="customer-codename">Codename: <span>{{ entry.codename }} </span></div>
+	    {% endif %}
+	    {% if entry.email %}
+	    <div class="customer-email">Email: <span>{{ entry.email|safe }}</span></div>
+	    {% endif %}
+	    <div class="customer-birthdate">Birthdate: <span>{{ entry.birth }}</span></div> 
 	  </div>
 	  <div class="right-li">
 	    <button class="btn btn-block btn-lg btn-danger" onclick="deleteParentListElement(this);"><span class="fui-cross"></span></button>
