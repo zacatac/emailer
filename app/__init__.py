@@ -10,7 +10,7 @@ from flask.ext.mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.migrate import Migrate
 from database import db
-from models import User, IceRegisterForm
+from models import Users, IceRegisterForm
 
 # Setup flask cache
 cache = Cache()
@@ -55,7 +55,7 @@ def create_app(object_name, env="development"):
         translations = [str(translation) for translation in babel.list_translations()]
         return request.accept_languages.best_match(translations)
     # Setup Flask-User
-    db_adapter = SQLAlchemyAdapter(db,  User)       # Select database adapter
+    db_adapter = SQLAlchemyAdapter(db,  Users)       # Select database adapter
     user_manager = UserManager(db_adapter, 
                                app,
                                register_form = IceRegisterForm)     # Init Flask-User and bind to app

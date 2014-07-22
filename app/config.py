@@ -1,4 +1,5 @@
 import os
+from getpass import getpass
 ABSOLUTE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 class Config(object):
@@ -46,8 +47,6 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     SECRET_KEY = 'testing key'
-    CACHE_TYPE = 'simple'
-    DATABASE = 'ice.db'
-    DATABASE_DIRECTORY = 'db'
-    SQLALCHEMY_DATABASE_URI = "postgresql://root:toor@localhost/ice" 
+    CACHE_TYPE = 'null'
+    SQLALCHEMY_DATABASE_URI = "postgresql://postgres@localhost/ice" 
     # 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE) 
