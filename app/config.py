@@ -32,16 +32,15 @@ class DevelopmentConfig(Config):
     SECRET_KEY = 'development key'
     DATABASE = 'dev.db'
     DATABASE_DIRECTORY = 'db'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE)    
+    SQLALCHEMY_DATABASE_URI = "postgresql://zrfield@localhost/dev"
     DEBUG = True
     CACHE_TYPE = 'null'
     WTF_CSRF_ENABLED = False
 
 class TestingConfig(Config):
     SECRET_KEY = 'testing key'
-    DATABASE = 'test.db'
-    DATABASE_DIRECTORY = 'db'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE)    
+    SQLALCHEMY_DATABASE_URI = 'postgresql://zrfield@localhost/test'
+    #sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE)    
     TESTING = True
     SERVER_NAME='localhost'  # Enable url_for() without request context
 
@@ -50,4 +49,5 @@ class ProductionConfig(Config):
     CACHE_TYPE = 'simple'
     DATABASE = 'ice.db'
     DATABASE_DIRECTORY = 'db'
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE) 
+    SQLALCHEMY_DATABASE_URI = "postgresql://root:toor@localhost/ice" 
+    # 'sqlite:///' + os.path.join(ABSOLUTE_PATH,DATABASE_DIRECTORY,DATABASE) 

@@ -41,8 +41,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(255), nullable=False, unique=True)
     confirmed_at = db.Column(db.DateTime())
     reset_password_token = db.Column(db.String(100), nullable=False, default='')
-    level = db.Column(db.Integer, default=0)
-    # Relationships
+    # level = db.Column(db.Integer, default=0)
+    # relationships
     roles = db.relationship('Role', secondary=user_roles,
                             backref=db.backref('users', lazy='dynamic'))
     
@@ -62,17 +62,6 @@ class Customer(db.Model):
     phone = db.Column(db.Integer)
     entered = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, first_name, last_name, birth, sex,
-                 email, phone, entered=None):
-        self.first_name = first_name
-        self.last_name = last_name
-        self.birth = birth
-        self.email = email
-        self.phone = phone
-        self.sex = sex
-        if entered is None:
-            entered = datetime.now()
-        self.entered = entered
 
     def __repr__(self):
         return '<User: {0}>'.format(self.first_name + self.last_name)
@@ -86,12 +75,12 @@ class Laser(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     codename = db.Column(db.String, nullable=False)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
+
 class LearnToSkate(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     skill = db.Column(db.Integer, nullable=False)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     
-
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
     available = db.Column(db.PickleType)

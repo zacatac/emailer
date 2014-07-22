@@ -2,9 +2,11 @@
 import os
 
 from flask.ext.script import Manager, Server
+from flask.ext.migrate import MigrateCommand
 from app import create_app
 from app.models import Customer, User, Role
 from app.database import db
+
 
 
 env = os.environ.get('APPNAME_ENV', 'development')
@@ -12,6 +14,7 @@ app = create_app('app.config.%sConfig' % env.capitalize(), env=env)
 user_manager = app.user_manager
 
 manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 manager.add_command("server", Server())
 
 

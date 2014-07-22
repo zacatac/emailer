@@ -3,17 +3,26 @@
 
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
     <div class="nav-container">
+      {% if current_user.is_authenticated() and current_user.has_roles('management')%}
       <div class="nav-page-whole"> 
 	  <a href="{{ url_for('customer.options')}}" class="btn btn-block btn-lg btn-customers btn-nav">Manage Customers</a>
       </div>
       <div class="nav-page-whole"> 
-	  <a href="{{ url_for('main.calendar') }}" class="btn btn-block btn-lg btn-calendar btn-nav">Create a calendar</a>
-      </div>    
-      <div class="nav-page-whole"> 
 	  <a href="{{ url_for('email.index') }}" class="btn btn-block btn-lg btn-emails btn-nav">Send emails</a>
      </div>
+     {% endif %}
       <div class="nav-page-whole"> 
-	  <a href="{{ url_for('schedule.hours') }}" class="btn btn-block btn-lg btn-schedule btn-nav">Create a schedule</a>
+	  <a href="{{ url_for('main.calendar') }}" class="btn btn-block btn-lg btn-calendar btn-nav">Create a calendar</a>
+      </div>    
+      {% if current_user.is_authenticated() and current_user.has_roles('management') %}
+        {% set schedule_link = url_for('schedule.manage') %}
+        {% set schedule_link_title = 'Create a schedule' %}
+      {% else %}
+        {% set schedule_link = url_for('schedule.hours') %}
+        {% set schedule_link_title = 'Set your schedule' %}
+      {% endif %}
+      <div class="nav-page-whole"> 
+	  <a href="{{ schedule_link }}" class="btn btn-block btn-lg btn-schedule btn-nav">{{ schedule_link_title }}</a>
      </div>
 
     </div>

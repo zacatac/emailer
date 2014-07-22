@@ -11,7 +11,7 @@ function setDate(){
 }
 
 
-function createTimeOptions(day,i){
+function createTimeOptions(day,i,set){
     var optionBlock = "";
     var time = " AM";
     for (var val = 0; val < 24; val++){
@@ -26,31 +26,40 @@ function createTimeOptions(day,i){
     	optionBlock += "<option value=\"" + val + "\">" + hour + time + "</option>";
     }
     return "<td>"+day+":</td><td>"     
-    	+"<select name=\"start"+i+"\" onchange=\"updateHours(this)\">"
+    	+"<select name=\"set"+set+";start"+i+"\" onchange=\"updateHours(this)\">"
     	+ optionBlock
     	+"</select></td><td>"
-    	+"<select name=\"end"+i+"\" onchange=\"updateHours(this)\">"
+    	+"<select name=\"set"+set+";end"+i+"\" onchange=\"updateHours(this)\">"
     	+ optionBlock
     	+"</select></td>";
 }
 
 function writeHours(){
     var days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-    table = "<table name=\"hours-table\">"
-	+"<thead>"
-	+"<tr>"
-	+"<th>Day<\/th>"
-	+"<th>Start<\/th>"
-	+"<th>End<\/th>"
-	+"<\/tr>"
-	+"<\/thead>"
-        +"<tbody>"
+    hoursDivs = $('.time-table');
+    $(hoursDivs).each(function (index) {
+	table = "<table name=\"hours-table\">"
+	    +"<thead>"
+	    +"<tr>"
+	    +"<th>Day<\/th>"
+	    +"<th>Start<\/th>"
+	    +"<th>End<\/th>"
+	    +"<\/tr>"
+	    +"<\/thead>"
+            +"<tbody>"
+	
+	
+	for (var i=0; i<7;i++){
+	    table += "<tr>" + createTimeOptions(days[i],i,index)+ "<\/tr>" ;
+	}
+	table += "\n</tbody>"
+	
+	console.log(this)
+	$(this).html(table);
+	$(this).attr("name","hours"+index);
+	
+    });
 
-    for (var i=0; i<7;i++){
-	table += "<tr>" + createTimeOptions(days[i],i)+ "<\/tr>" ;
-    }
-    table += "\n</tbody>"
-    document.getElementsByName('hours')[0].innerHTML = table;
 }
 
 function setDefaultHours(){ 
@@ -88,32 +97,42 @@ function loadCalendar() {
 }
 
 function makeEditable(el){
-    var leftDiv = $(el).parents().prev('.left-li');
-    var rightDiv= $(el).closest('.right-li');
-    var editButton = rightDiv.children('input');
-    var change_to_edit = true;
-    $(el).parents().prev('.left-li').children('[class^=customer]').each(function (index) {
-	console.log("caller: " + index);
-	var this_span = $(this).children('span');
-	if (this_span.attr("contenteditable") === "false" || this_span.attr("contenteditable") === undefined){
-	    this_span.attr("contenteditable",true);
-	    change_to_edit = false;
-	}
-	else {
-	    this_span.attr("contenteditable",false);
-	}
-    });
-    if (change_to_edit === true){
-	$(editButton).attr("value","edit");     
+    var toBeSet = "#1abc9c";
+    var toBeSetRGB = "rgb(26, 188, 156)"
+    var alreadySet = "#e85546";
+    var alreadySetRGB = "rgb(232, 85, 70)"
+    console.log($(el).parent());
+    var button = $(el);
+    var hoursSet = false;
+    if (button.attr("contentedit") === "true"){
+	button.attr("contentedit","false");
+	hoursSet = true;
     } else {
-	$(editButton).attr("value","save");     
+	button.attr("contentedit","true");
     }
+    console.log(hoursSet)
+    if (hoursSet === false) {
+	button.attr("value","Hours Set");
+	button.css("background-color",alreadySet);
+    } else {
+	button.attr("value",$(el).attr("name"));
+	button.css("background-color",toBeSet);
+    }
+    // var buttons = $(".btn-hours");
+    // var allSet = true;
+    // buttons.each(function () {
+    // 	console.log(this);
+    // 	console.log($(this).css("background-color"));
+    // 	console.log($(this).css("background-color") === alreadySetRGB);
+    // 	console.log($(this).css("background-color") === toBeSetRGB);
+    // }); 
+    
 }
 
 
 $(document).ready(function() {
     writeHours();
-    setDefaultHours();
+    // setDefaultHours();
     var sample = document.getElementById('sample');
     $("#saveAll").click(function(e) {
 	e.preventDefault();

@@ -8,6 +8,7 @@ from flask_user import current_user, login_required, UserManager, UserMixin, SQL
 from flask_user.forms import RegisterForm
 from flask.ext.mail import Mail
 from flask.ext.login import LoginManager
+from flask.ext.migrate import Migrate
 from database import db
 from models import User, IceRegisterForm
 
@@ -45,6 +46,9 @@ def create_app(object_name, env="development"):
     
     # Initialize Flask-Mail
     mail = Mail(app)       
+
+    # Initialize Flask-Migrate
+    migrate = Migrate(app,db)
                          
     @babel.localeselector
     def get_locale():

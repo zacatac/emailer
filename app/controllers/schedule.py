@@ -21,42 +21,54 @@ from ..models import User, Schedule
 schedule = Blueprint('schedule', __name__)
 
 @schedule.route('/schedule/manage', methods=['GET','POST'])
-# @roles_required('management')
+@roles_required('management')
+def manage():    
+    if request.method == "POST":
+        sets = ["Laserstrike","Cafe","Skateguard","Cashier","Zam","Maintenance","Cleaning","Janitor"]
+        
+        print(request)
+        for item in request.form:
+            if item == "schedule-submit":
+                continue
+            set = int(item.split(";")[0][-1])
+            # print (sets[set],request.form[item])
+    return render_template('schedule.html')
+
+@schedule.route('/schedule/set',methods=['GET','POST'])
+@login_required
 def hours():
     if request.method == "POST":
         hours = {}
         for item in request.form:
             hours[item] = request.form[item]
-        print(hours)
         user = User.query.filter_by(id=current_user.id).first()
-        print(user.username, user.email)
         if user is None:
-            raise ValueError("NOOOOOOOO")
+            raise ValueError("User should have been found")
         available = []
         for i in range(7):
             data = (hours['start%s' % i], hours['end%s' % i])
             available.append(data)        
-        print(available)
         sch = Schedule.query.filter_by(user_id=user.id).first()
-        if sch is None:
-            
+        if sch is None:            
             sch = Schedule(user_id=user.id,available=available)
             db.session.add(sch)
         else:
-            print('not handled properly')
             sch.available=available
         db.session.commit()
         
         flash('Hours Uploaded!')
         sch = Schedule.query.filter_by(user_id=user.id).first()
         print(sch.available)
-        return render_template('hours.html')                
+        return render_template('hours.html') 
     return render_template('hours.html')
 
-@schedule.route('/schedule/register', methods=['GET','POST'])
-@roles_required('management')
-def register_employee():
-    return render_template('employee_login_or_register.html')
+
+# @schedule.route('/schedule/register', methods=['GET','POST'])
+# @roles_required('management')
+# def register_employee():
+
+#     return render_template('login_or_register.html')
+
 
 # # Set up a Flow object to be used if we need to authenticate. This
 # # sample uses OAuth 2.0, and we set up the OAuth2WebServerFlow with
