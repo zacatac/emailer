@@ -2,9 +2,11 @@
 import os
 
 from flask.ext.script import Manager, Server
+from flask.ext.migrate import MigrateCommand
 from app import create_app
 from app.models import Customer, User, Role
 from app.database import db
+
 
 
 env = os.environ.get('APPNAME_ENV', 'development')
@@ -12,6 +14,7 @@ app = create_app('app.config.%sConfig' % env.capitalize(), env=env)
 user_manager = app.user_manager
 
 manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 manager.add_command("server", Server())
 
 
@@ -31,12 +34,32 @@ def createdb():
     """
     # print(app.config['SQLALCHEMY_DATABASE_URI'])
     db.create_all()
+    manager_role = Role(name='management')
+    employee_role = Role(name='employee')
+    db.session.add(manager_role)
+    db.session.add(employee_role)
+    db.session.commit()
     if not User.query.filter(User.username=='user007').first():
+
         user1 = User(username='user007', email='user007@example.com', active=True,
                      password=user_manager.hash_password('Password1'))
-        user1.roles.append(Role(name='secret'))
-        user1.roles.append(Role(name='agent'))
+        user1.roles.append(employee_role)
+        # user1.set_role()
         db.session.add(user1)
+        db.session.commit()
+
+        user2 = User(username='test', email='testuser@icesportsforum.com', active=True,
+                     password=user_manager.hash_password('Password1'))
+        # user2.set_role()
+        user2.roles.append(manager_role)
+        db.session.add(user2)
+        db.session.commit()
+
+        user3 = User(username='test3', email='testuser3@icesportsforum.com', active=True,
+                     password=user_manager.hash_password('Password1'))
+        # user3.set_role()
+        user3.roles.append(manager_role)
+        db.session.add(user3)
         db.session.commit()
 
 

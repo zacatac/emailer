@@ -1,6 +1,6 @@
 from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack, jsonify, Blueprint
-from flask.ext.user import login_required
+from ..flask_user import login_required, roles_required
 from util import create_command
 from app import cache
 from . import db
@@ -8,7 +8,7 @@ from . import db
 email = Blueprint('email', __name__)
 
 @email.route('/email/create',methods=['GET','POST'])
-@login_required
+@roles_required('management')
 def multi_search():
     search_dict = {}
     print(request.form)
@@ -29,6 +29,6 @@ def multi_search():
     return render_template('email.html',entries=entries)
 
 @email.route('/email', methods=['GET','POST'])
-@login_required
+@roles_required('management')
 def index():
     return render_template("email.html")

@@ -4,9 +4,11 @@ from flask.ext.assets import Environment, Bundle
 from webassets.loaders import PythonLoader as PythonAssetsLoader
 from flask.ext.cache import Cache
 from flask.ext.babel import Babel
-from flask.ext.user import current_user, login_required, UserManager, UserMixin, SQLAlchemyAdapter, roles_required
+from flask_user import current_user, login_required, UserManager, UserMixin, SQLAlchemyAdapter, roles_required
+from flask_user.forms import RegisterForm
 from flask.ext.mail import Mail
 from flask.ext.login import LoginManager
+from flask.ext.migrate import Migrate
 from database import db
 from models import User, IceRegisterForm
 
@@ -44,6 +46,9 @@ def create_app(object_name, env="development"):
     
     # Initialize Flask-Mail
     mail = Mail(app)       
+
+    # Initialize Flask-Migrate
+    migrate = Migrate(app,db)
                          
     @babel.localeselector
     def get_locale():
@@ -74,4 +79,4 @@ if __name__ == '__main__':
     # Create 'user007' user with 'secret' and 'agent' roles
 
 
-    app.run()
+    app.run(host='0.0.0.0')

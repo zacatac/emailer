@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block body %}
+<body>
+  <script src="/static/js/schedule.js"></script> 
+  <form action ="{{ url_for('schedule.manage')}}" method="post" name="schedule-form" >
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+    <div  class="form-group form-hours-button">      
+      <input type=button value="Set Laserstrike Hours" name="Set Laserstrike Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>    
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group form-hours-button">
+      <input type=button value="Set Cafe Hours" name="Set Cafe Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group form-hours-button">
+        <input type=button value="Set Skateguard Hours" name="Set Skateguard Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group form-hours-button">
+        <input type=button value="Set Cashier Hours" name="Set Cashier Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group form-hours-button">
+        <input type=button value="Set Zam Hours" name="Set Zam Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group form-hours-button">
+        <input type=button value="Set Maintenance Hours" name="Set Maintenance Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group form-hours-button">
+        <input type=button value="Set Cleaning Hours" name="Set Cleaning Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>
+  <div class="schedule-block">
+    <div name="hours" class="time-table">
+      <!--  FILLED IN! -->
+    </div>
+
+    <div  class="form-group form-hours-button">
+        <input type=button value="Set Janitor Hours" name="Set Janitor Hours" class="btn btn-block btn-lg btn-hours btn-bar" onclick="makeEditable(this);">
+    </div>   
+  </div>
+  <br>
+  <div  class="form-group">
+        <input type=submit value="Create Schedule" name="schedule-submit" class="btn btn-block btn-lg btn-customers submit-buttons btn-bar">
+  </div>   
+  </form>
+  <br>
+  <div  class="form-group">
+    <a class="btn btn-block btn-lg btn-customers submit-buttons btn-bar" id="schedule-register" href="{{ url_for('user.register') }}">Register Employee</a>
+  </div>   
+  <div id="sample">
+  </div>
+</body>
+{% endblock %}
+

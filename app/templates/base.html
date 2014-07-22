@@ -25,7 +25,14 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8 col-md-7 col-lg-6 col-centered">
-                <h1><a href="/">{% block title %}Ice - Login{% endblock %}</a></h1>
+		  {% if current_user.is_authenticated() and current_user.has_roles('management') %}
+		    {% set title = 'Register an Employee' %}
+		  {% else %} 
+		    {% set title = 'Login' %}
+		  {% endif %}
+
+                <h1><a href="/">{% block title %}{% endblock %}Ice - {{title}}</a></h1>
+
                 <hr>
                 {% block flash_messages %}
                     {%- with messages = get_flashed_messages(with_categories=true) -%}
