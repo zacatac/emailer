@@ -1,3 +1,16 @@
+Version 1.1.1:
+ - initial kiosk application implementation
+ - Local branch not up to date with latest release merge with origin/develop Merge branch 'develop' of https://github.com/zacatac/emailer into develop
+ - communicating with kiosk server
+ - develop caught up with latest release
+ - final release version
+ - converted to postgres syntax. Not yet tested
+ - Changed user model to users for postgres reservation. Changed all references to user. Set production cache to null ^Cas causing strange login-logout behavior)
+ - upstream merge with develop
+ - add codename field to email
+ - updated in production
+ - WSGI working with development. Unorthodox production push. Thou shalt not do this any more
+
 Version 1.1:
 
 
