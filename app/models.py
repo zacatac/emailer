@@ -29,7 +29,7 @@ class IceRegisterForm(RegisterForm):
 # Define the User-Roles pivot table
 user_roles = db.Table('user_roles',
                       db.Column('id', db.Integer(), primary_key=True),
-                      db.Column('user_id', db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE')),
+                      db.Column('user_id', db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE')),
                       db.Column('role_id', db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE')))
 
 # Define User model.
@@ -56,9 +56,9 @@ class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String, nullable=False)
     last_name = db.Column(db.String, nullable=False)
-    birth = db.Column(db.DateTime)
+    birth = db.Column(db.Date)
     sex = db.Column(db.Integer)
-    email = db.Column(db.String)
+    email = db.Column(db.String, unique=True, nullable=True)
     phone = db.Column(db.Integer)
     entered = db.Column(db.DateTime, nullable=False)
 
@@ -84,4 +84,4 @@ class LearnToSkate(db.Model):
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)    
     available = db.Column(db.PickleType)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))

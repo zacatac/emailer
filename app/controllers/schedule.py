@@ -5,8 +5,7 @@ from flask import request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack, jsonify, Blueprint
 from ..flask_user import login_required, roles_required, current_user
 from app import cache
-from . import db
-from ..models import User, Schedule
+from . import db, Users, Schedule
 
 
 # import gflags

@@ -1,0 +1,35 @@
+Version 1.1:
+
+
+Version 0.1.0
+ - Merge branch 'schedule' into develop
+ - migrating to postgres and some schedule foundations laid out
+ - new role handling. Ability to add schedules and register non-admin employees (done by admin employee)
+ - ignore is now working
+ - another attempt at removing db files from commits
+ - commiting work on schedule so that .gitignore can be updated:
+ - Fixed test_forms conflict
+ - account created for user emails. Updated in config. Began working on scheduling program
+ - Updated Flask-Mail email templates
+ - Added tests for icesportsforum domain checking on register
+ - Added users, roles, and icesportsforum email validation
+ - independent change
+ - establish branch
+ - establish branch
+ - final commit before restructuring of repo
+ - forgot an import
+ - stray save
+ - updated relative imports; removed \.csv from gitignore
+ - corrected requirements
+ - attempting to correct pip
+ - .gitignore is now working
+ - Production version 0.0.1; Updated link to animo.js; Updated sqlite paths in config;
+ - Restructured application (Blueprints, Flask-Testing, application factory). First production version
+ - completed email export
+ - initial implementation complete. Testing to come
+ - added multi criteria front end
+ - email search functionality for single queries complete
+ - Huge update! Basic functionality up and running. Can login; register customers; find customers; and categorize customers by their fields
+ - the names have been collected!
+ - init
+

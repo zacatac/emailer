@@ -32,8 +32,8 @@ def find():
         search_dict = {key: value for key, value in search_dict.items() 
                        if value[2] != ''}
         if search_dict: 
-            command = create_command(search_dict)                    
-            entries = db.engine.execute(command).fetchall()
+            command = create_command(search_dict)
+            entries = db.engine.execute(command)
         else:
             entries = []
         return render_template('find.html', entries=entries)
