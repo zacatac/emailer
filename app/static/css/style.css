@@ -43,6 +43,10 @@ h2              { font-size: 1.2em; }
     text-align:center;
 }
 
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
 #sample{
     position: relative; left:-200px;
     margin: 0 auto;
