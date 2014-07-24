@@ -1,0 +1,114 @@
+{% extends 'flask_user/public_base.html' %}
+
+{% block content %}
+
+ <body screen_capture_injected="true">
+<div class="row">
+<div class="col-sm-6">
+
+{% if swipe %}
+
+ <h1>Sign in</h1>
+<form action="{{ url_for('kiosk.main') }}" method="POST" class="form" role="form">
+    
+    
+    <div class="form-group  ">
+        
+            
+            <label for="username" class="control-label">Email</label>
+        
+        <input class="form-control" id="username" name="username" tabindex="110" type="text" value="">
+        
+    </div>    
+    
+    <input type="submit" value="Sign in" tabindex="180">
+</form>
+    
+   
+</div>
+<div class="col-sm-6">
+
+<h1>Register</h1>
+
+
+<form action="{{ url_for('kiosk.main') }}" method="POST" novalidate="" formnovalidate="" class="form" role="form">
+
+
+    <div class="form-group  ">
+        
+            
+            <label for="first_name" class="control-label">First Name</label>
+        
+        <input class="form-control" id="first_name" name="first_name" tabindex="210" type="text" value="">
+        
+    </div>
+
+    <div class="form-group  ">
+        
+            
+            <label for="last_name" class="control-label">Last Name</label>
+        
+        <input class="form-control" id="last_name" name="last_name" tabindex="210" type="text" value="">
+        
+    </div>
+    
+    <div class="form-group  ">
+        
+            
+            <label for="codename" class="control-label">Codename</label>
+        
+        <input class="form-control" id="codename" name="codename" tabindex="210" type="text" value="">
+        
+    </div>
+
+    <div class="form-group">
+            <label for="birth" class="control-label">Birthdate</label>
+      <div class='input-group date' id='dp5' data-date-format="MM/DD/YYYY" >
+        <input type='text' class="form-control" name="birth"/>
+        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+        </span>
+      </div>
+    </div>
+
+
+
+    <div class="form-group">
+      <label for="sex" class="control-label">Gender</label>
+      <select class="form-control" name="sex">
+	<option value="M">Male</option>
+	<option value="F">Female</option>
+	<option value="">Other</option>
+      </select>
+    </div>
+        <div class="form-group  ">
+        
+            
+            <label for="email" class="control-label">Email</label>
+        
+        <input class="form-control" id="email" name="email" tabindex="220" type="text" value="">
+        
+    </div>    
+  
+  
+
+    
+    
+    <input type="submit" value="Register" tabindex="280">
+</form>
+{% else %}
+<h1> Swipe your card </h1>
+<form action="{{ url_for('kiosk.main') }}" method="POST" class="form" role="form">
+    <div class="form-group  ">
+                    
+            <label for="swipe" class="control-label">Swipe</label>
+        
+        <input class="form-control" id="swipe" name="swipe" tabindex="110" type="text" value="">
+        
+    </div>    
+    <input type="submit" value="Enter Swipe" tabindex="180" id="swipe-button">
+</form>
+{% endif %}
+</div>
+</div>
+  </body>
+{% endblock %}
