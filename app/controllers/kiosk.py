@@ -14,13 +14,14 @@ codename = False
 swipe = False
 
 @kiosk.route('/kiosk',methods=['GET','POST'])
+@kiosk.route('/api/kiosk',methods=['GET','POST'])
 def main():
     user_manager = current_app.user_manager
     login_form = user_manager.login_form(request.form)
     register_form = user_manager.register_form(request.form)
     
     if request.method == 'POST':  
-        # swipe='%LTCC0000000000006506?;000000000000006506?'
+        # swipe='%LTCC0000000000006580?;000000000000006580?'
         # true_swipe = {'swipe':swipe}
 
         # test_data = {

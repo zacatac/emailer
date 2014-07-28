@@ -8,7 +8,7 @@ from app.models import Customer, Users, Role
 from app.database import db
 
 
-env = os.environ.get('APPNAME_ENV', 'development')
+env = os.environ.get('APPNAME_ENV', 'production')
 app = create_app('app.config.%sConfig' % env.capitalize(), env=env)
 
 # prod_env = os.environ.get('APPNAME_ENV', 'production')
