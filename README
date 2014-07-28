@@ -1,23 +1,18 @@
-                         / Flaskr /
+                         / Ice /
 
-                 a minimal blog application
+         a customer relationship management application
 
 
-    ~ What is Flaskr?
+    ~ What is ICE?
 
-      A sqlite powered thumble blog application
+      A customer relationship management application
 
     ~ How do I use it?
 
-      1. edit the configuration in the flaskr.py file or
-         export an FLASKR_SETTINGS environment variable
-         pointing to a configuration file.
+      1. You can login/register with your icesportsforum email 
 
-      2. now you can run the flaskr.py file with your
-         python interpreter and the application will
-         greet you on http://localhost:5000/
+      2. 4 different options from there.
 	
     ~ Is it tested?
 
-      You betcha.  Run the `flaskr_tests.py` file to see
-      the tests pass.
+      Not all that much. Working on it...
