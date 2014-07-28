@@ -210,6 +210,10 @@ class LoginForm(Form):
         # All is well
         return True
 
+class KioskLoginForm(LoginForm):
+    username = None
+    
+
 class RegisterForm(Form):
     password_validator_added = False
 
