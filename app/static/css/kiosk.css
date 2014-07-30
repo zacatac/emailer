@@ -1,13 +1,83 @@
+html {
+    background: transparent;
+}
+
+body {
+    background: #BDC3C7;
+/* #2C3E50; */
+}
+
 .col-centered{
     float: none;
     margin: 0 auto;
 }
 
-.flash{
-    font-size:50px;
-}
-
-.video{
+#video, #canvas{
     border: 30px solid black;
     border-radius: 15px 15px 15px 15px;
+}
+
+.kiosk-headline {
+    /* padding: 73px 0 110px; */
+    text-align: center;
+}
+.kiosk-logo {
+    font: 900 90px/100px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: -2px;
+    margin: 10px 0;
+/* color: #1ABC9C; */
+}
+
+.kiosk-swipe{
+    font: 900 180px/200px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    /* font-size: 7em; */
+    color: #16A085;
+}
+
+.kiosk-logo .logo {
+    /* background: url(../Flat-UI/images/icons/Lasericon.gif) center 0 no-repeat; */
+    /* background-size: 236px 181px; */
+    background-size: 200px 180px;
+    height: 181px;
+    margin: 0 auto 26px;
+    overflow: hidden;
+    text-indent: -9999em;
+    width: 236px;
+    position: absolute; right: 300px; top: 5px;      
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu {
+    visibility: visible;
+    opacity: 1;
+    width: auto;
+} 
+
+
+.control-label{
+    font: 900 20px "Helvetica Neue", Helvetica, Arial, sans-serif;    
+    color: #16A085;
+}
+
+/* a { */
+/*     color: #7F8C8D; */
+/* } */
+
+/* a:hover{ */
+/*     color: #95A5A6; */
+/* } */
+.waiver-text{
+    color: #ffffff;
+    margin: 0px -200px 0px -200px;
+}
+
+.input-group-addon{
+    background: #34495E;
+}
+
+.waiver-heading{
+    margin-top: -15px;
+}
+
+.waiver-question{
+    margin-top: 8px;
 }

@@ -14,7 +14,6 @@ codename = False
 swipe = False
 
 @kiosk.route('/kiosk',methods=['GET','POST'])
-@kiosk.route('/api/kiosk',methods=['GET','POST'])
 def main():
     user_manager = current_app.user_manager
     login_form = user_manager.login_form(request.form)

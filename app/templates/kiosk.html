@@ -1,11 +1,47 @@
-{% extends 'flask_user/public_base.html' %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Laserstrike</title>
+    
+    <meta name="viewport" content="width=1000, initial-scale=1.0, maximum-scale=1.0">
+    
+        <!-- Loading Bootstrap -->
+    <link href="static/Flat-UI/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/datepicker-local/css/bootstrap-datetimepicker.css" rel="stylesheet">
 
-{% block content %}
+
+    <!-- Loading Flat UI -->
+    <link href="static/Flat-UI/css/flat-ui.css" rel="stylesheet">
+    <link href="static/Flat-UI/css/demo.css" rel="stylesheet">
+    <link rel="shortcut icon" href="static/Flat-UI/images/favicon.ico">
+
+    <!-- Load Kiosk & Animo -->
+    <link href="/static/animo.js/animate+animo.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/kiosk.css" rel="stylesheet" type="text/css">
+
+    
+        <!-- HTML5 shim, for IE6-8 support of HTML5 elements. All other JS at the end of file. -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+  </head>
  <body screen_capture_injected="true">
+ <div class="container kiosk-container">
+   <div class="kiosk-headline">
+     <h1 class="kiosk-logo kiosk-logo-realign">       
+       <!-- <div class="logo"></div> -->
+       Laserstrike
+     </h1>
+     {% for message in get_flashed_messages() %}
+     <div class=flash>{{ message }}</div>
+     {% endfor %}     
+   </div> <!-- /demo-headline -->
 
 {% if swipe %}
    <div class="row">
-<div class="col-md-5 col-centered">
+<div class="col-md-6 col-centered">
 
   <h1>
     <a href="javascript:void(0);" id="kiosk-login-button">Sign in</a>
@@ -18,13 +54,12 @@
       <div class="form-group  ">
         
         
-        <label for="email" class="control-label">Email <a href="javascript:void(0);" id="kiosk-no-email-button">Never entered your email?</a></label>
+        <label for="email" class="control-label">Email</label>
         
         <input class="form-control" id="email" name="email" tabindex="110" type="text" value="">
-        
+        <a href="javascript:void(0);" id="kiosk-no-email-button">Never entered your email?</a>
       </div>    
-      
-      <input type="submit" value="Sign in" tabindex="180">
+      <input type="submit" class="btn btn-block btn-lg btn-primary" value="Sign in" tabindex="280" id="signin-button">	    	    	    
     </form> 
   </div>
 </div>
@@ -67,10 +102,10 @@
     <div class="form-group">
             <label for="birth" class="control-label">Birthdate</label>
 	    <div class="row">
-	      <div class="col-md-4">
+	      <div class="col-md-4 birth-select">
 		<div class='input-group date' id='dp5' data-date-format="MM/DD/YYYY" >
-		  <input type='text' class="form-control" name="birth"/>
-		  <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+		  <input type='text' class="form-control" name="birth" id="birth-text"/>
+		  <span class="input-group-addon" id="calendar-click"><span class="glyphicon glyphicon-calendar"></span>
 		  </span>		    
 		</div>
 	      </div>
@@ -82,14 +117,13 @@
     <div class="form-group">
       <label for="sex" class="control-label">Gender</label>
       <div class="row">
-	<div class="col-md-4">
-	  
-	  <select class="form-control" name="sex">
-	    <option value="M">Male</option>
-	    <option value="F">Female</option>
-	    <option value="">Other</option>
-	  </select>
-	</div>
+	<div class="col-xs-3">
+          <select name="sex" value="" class="select-block" style="display: none;">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+            <option value="">Other</option>
+          </select>
+        </div>
       </div>
     </div>
         <div class="form-group  ">
@@ -104,18 +138,16 @@
   
 
     
-    
-    <input type="submit" value="Register" tabindex="280">
+    	    <input type="submit" class="btn btn-block btn-lg btn-primary" value="Register" tabindex="280" id="register-button">	    	    	    
 </form>
 </div>
 </div>
 </div>
 {% elif waiver %}
 <div class="row">
-  <div class="col-md-12">
-
-      <h1>ICE SPORTS FORUM ACKNOWLEDGEMENT AND RELEASE</h1>
-      
+  <div class="col-md-12">    
+    <h3 class="waiver-heading">ICE SPORTS FORUM ACKNOWLEDGEMENT AND RELEASE</h3>
+      <div class="waiver-text">
       <p>For and in consideration of the admission price and the permission to use the ICE SPORTS FORUM Facilities (including but not
 	limited to all property, amusements, attractions, and improvements in and around the premises commonly known as 10222
 	Elizabeth Pl, Tampa, FL) you hereby agree to and acknowledge the following:
@@ -155,25 +187,32 @@
 	DO AGREE TO THIS ACKNOWLEDGEMENT AND RELEASE UNLESS YOU HAVE READ IT AND UNDERSTAND IT.  IF YOU DON'T UNDERSTAND IT,
 	ASK AN ICE SPORTS FORUM REPRESENTATIVE FOR ASSISTANCE.
       </p>
-      <form action="{{ url_for('kiosk.main') }}" method="POST" novalidate="" formnovalidate="" class="form" role="form">
+      </div>
 	<div class="row">
-	  <div class="col-md-4 col-centered">
-	    <div class="form-group">
-	      <label for="waiver" class="control-label"><h6>Do you agree to the waiver?</h6></label>
+      <form action="{{ url_for('kiosk.main') }}" method="POST" novalidate="" formnovalidate="" class="form" role="form">
+
+	  <div class="col-md-12 col-centered">
+	    <div class="form-group" >
 	      <div class="row">
-		<div class="col-md-3">
-		  
-		  <select class="form-control" name="waiver" id="waiver">
-		    <option value="N">No</option>
-		    <option value="Y">Yes</option>
-		  </select>	      
+		<div class="col-md-8 col-centered">
+	      <div class="col-md-6">
+	      <label for="waiver" class="control-label"><h6 class="waiver-question">Do you agree to the waiver?</h6></label>
+	      </div>
+	      <div class="col-md-2">
+	      <select name="waiver" id="waiver" value="" class="select-block" style="display: none;">
+		<option value="N">No</option>
+		<option value="Y">Yes</option>
+	      </select>
+	      </div>
+	    <input type="submit" class="btn btn-block btn-lg btn-info" value="Continue" tabindex="280" style="display:none;" id="waiver-button">	    	    	    
+
 		</div>
 	      </div>
-	    </div>
-	    <input type="submit" class="btn btn-block btn-lg btn-info" value="Continue" tabindex="280" style="display:none;" id="waiver-button">	    	    	    
+	      <!-- </div> -->
 	  </div>
-	</div>
     </form>
+	  </div>
+
   </div>
 </div>
 
@@ -181,14 +220,16 @@
 <div class="row">
   <div class="col-md-7 col-centered">
     
-    <video class="video"id="video" width="640" autoplay></video>
+    <video class="video" id="video" width="640" autoplay id="video"></video>
+    <canvas id="canvas" width="580" height="435"></canvas>
 
-        <button id="snap" class="btn btn-block btn-lg btn-info">Snap Photo</button>
-    <canvas id="canvas" width="640" height="480"></canvas>
+    <button id="snap" class="btn btn-block btn-lg btn-primary">Snap Photo</button>
+    <button id="retake-photo" class="btn btn-block btn-lg btn-primary">Retake Photo</button>
+    <button id="save-photo" class="btn btn-block btn-lg btn-primary">Save Photo</button>
+
 
     <form action="{{ url_for('kiosk.main') }}" method="POST" >
       <input type="text" name="file" id="file"><br /><br />
-
       <input type="submit" value="submit" id="file-button">
     </form>
   </div>
@@ -197,30 +238,52 @@
 
 {% else %}
 <div class="row">
-<div class="col-md-12">
-
-  <h1 style="font-size:200px;"> Swipe <br> your<br> card </h1>
-  <div class="col-md-6">
-<form action="{{ url_for('kiosk.main') }}" method="POST" class="form" role="form">
-
-    <div class="form-group" >
-                    
-            <label for="swipe" class="control-label" style="display:none;">Swipe</label>
-        
-        <input class="form-control" id="swipe" name="swipe" tabindex="110" type="text" value="" style="opacity:1;">
-        
-    </div>    
-    <input type="submit" value="Enter Swipe" tabindex="180" id="swipe-button" style="display:none;">
-
-</form>
+  <div class="col-md-12">
+    <div class="col-md-6 col-centered">    
+    <h1 class="kiosk-logo col-centered kiosk-swipe">Swipe <br> your<br> card </h1>
+      <form action="{{ url_for('kiosk.main') }}" method="POST" class="form" role="form">
+	
+	<div class="form-group" >
+          
+          <label for="swipe" class="control-label" style="display:none;">Swipe</label>
+          
+          <input class="form-control" id="swipe" name="swipe" tabindex="110" type="text" value="" style="opacity:1;">
+          
+	</div>    
+	<input type="submit" value="Enter Swipe" tabindex="180" id="swipe-button" style="display:none;">
+	
+      </form>
+    </div>
   </div>
+</div>
 <!-- <p id="status" style="color: red;">Please accept the permissions dialog.</p>
 
 <script src="script.js"></script><video width="640" height="480"></video><canvas></canvas><button>Smile!</button><button id="save" disabled="">Save!</button> -->
-</div>
-</div>
-
+ </div>
 
 {% endif %}
+
+    <!-- Load JS here for greater good =============================-->
+
+    <script src="/static/Flat-UI/js/jquery-1.8.3.min.js"></script>
+    <script src="/static/Flat-UI/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="/static/Flat-UI/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="/static/Flat-UI/js/bootstrap.min.js"></script>
+    <script src="/static/Flat-UI/js/bootstrap-select.js"></script>
+    <script src="/static/Flat-UI/js/bootstrap-switch.js"></script>
+    <script src="/static/Flat-UI/js/flatui-checkbox.js"></script>
+    <script src="/static/Flat-UI/js/flatui-radio.js"></script>
+    <script src="/static/Flat-UI/js/jquery.tagsinput.js"></script>
+    <script src="/static/Flat-UI/js/jquery.placeholder.js"></script>
+    <!-- <script src="/static/Flat-UI/js/jquery.stacktable.js"></script> -->
+    <script src="http://vjs.zencdn.net/4.3/video.js"></script>
+    <script src="/static/Flat-UI/js/application.js"></script>
+    <script src="/static/js/kiosk.js"></script>
+    <script src="/static/animo.js/animo.js"></script>
+    <script src="static/js/moment.js"></script>
+    <script src="/static/datepicker-local/js/bootstrap-datetimepicker.js"></script>
+	
   </body>
-{% endblock %}
+
+
+ </html>
